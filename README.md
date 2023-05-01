@@ -17,7 +17,121 @@ npm i highrise-js-sdk@latest
 - Auto reconnect system.
 - Supports Node version 10+
 
-## **📚 Usage**
+## **📥 Class Import**
+```js
+const { Highrise } = require("highrise-js-sdk")
+const bot = new Highrise(token, roomID);
+```
+
+## **🎐 Events**
+- ready
+```js
+// Event emitted when the bot has successfully connected to the chat server.
+bot.on('ready', (client) => {
+  console.log(`The bot is now online: ${client}`)
+});
+```
+- chatMessageCreate
+```js
+// Event emitted when a chat message is created.
+bot.on('chatMessageCreate', (user, message) => {
+  console.log(`[${user.username}]: ${message}`);
+});
+```
+- whisperMessageCreate
+```js
+// Event emitted when a whisper message is created.
+bot.on('whisperMessageCreate', (user, message) => {
+  console.log(`[${user.username}] (whisper): ${message}`);
+});
+```
+- emoteCreate
+```js
+// Event emitted when an emote is created.
+bot.on('emoteCreate', (sender, receiver, emote) => {
+  console.log(`${sender.username} sent ${emote} to ${receiver.username}`);
+});
+```
+- reactionCreate
+```js
+// Event emitted when a reaction is created.
+bot.on('reactionCreate', (sender, receiver, reaction) => {
+  console.log(`${sender.username} sent ${reaction} to ${receiver.username}`);
+});
+```
+- tipReactionCreate
+```js
+// Event emitted when a tip reaction is created.
+bot.on('tipReactionCreate', (sender, receiver, item) => {
+  console.log(`Tip reaction from ${sender.username} to ${receiver.username}: ${item.amount} ${item.type}`);
+});
+```
+- playerJoin
+```js
+// Emitted when a player joins the room.
+bot.on('playerJoin', (user) => {
+  console.log(`${user.username}(${user.id}) Joined the room`);
+});
+```
+- playerLeave
+```js
+// Emitted when a player leaves the room.
+bot.on('playerLeave', (user) => {
+  console.log(`${user.username}(${user.id}) Left the room`);
+});
+```
+- TrackPlayerMovement
+```js
+// Emitted when a player moves or teleports in the game.
+bot.on('TrackPlayerMovement', (position) => {
+  if ('x' in position && 'y' in position && 'z' in position && 'facing' in position) {
+    console.log(`${user.username} moved to ${position.x}, ${position.y}, ${position.z}, ${position.facing}`);
+  } else if ('entity_id' in position && 'anchor_ix' in position) {
+    console.log(`${user.username} moved to anchor ${position.entity_id} at index ${position.anchor_ix}`);
+  }
+});
+```
+## **📜 Methods**
+- Sending Messages
+```js
+bot.message.send(message);
+bot.whisper.send(user.id, message);
+```
+- player control
+```js
+// Teleportation:
+bot.player.teleport(user.id, x, y, z, facing);
+bot.player.transport(user.id, roomId);
+// Emotes & Reactions:
+bot.player.emote(user.id, emoteID);
+bot.player.react(user.id, reaction);
+// Moderation:
+bot.player.kick(user.id);
+bot.player.ban(user.id, duration);
+bot.player.unban(user.id);
+bot.player.mute(user.id, duration);
+bot.player.unmute(user.id);
+```
+- Player Privilages
+```js
+await bot.privilege.fetch(userIds);
+const permissions = { moderator: true, designer: true };
+await bot.privilege.change(user.id, permissions);
+```
+- Player List
+```js
+await bot.room.players.fetch();
+await bot.room.players.getPosition(user.id);
+await bot.room.players.getId(user.username);
+await bot.room.players.getName(user.id);
+```
+- Client Control
+```js
+bot.walk.send(x, y, z, facing);
+await bot.indicator.set(icon);
+await bot.ping.get();
+```
+## **📚 More In Depth**
 ```js
 /**
  * Event emitted when the bot has successfully connected to the chat server.
