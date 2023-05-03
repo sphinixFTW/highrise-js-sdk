@@ -355,4 +355,7 @@ bot.walk.send(x, y, z, facing);
  */
 await bot.indicator.set(icon);
 ```
+## Note
+
+This package is not an official Highrise package, it's self-made by iHsein (sphinix) and is still in beta.
 
