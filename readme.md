@@ -83,7 +83,7 @@ bot.on('playerLeave', (user) => {
 - TrackPlayerMovement
 ```js
 // Emitted when a player moves or teleports in the game.
-bot.on('TrackPlayerMovement', (position) => {
+bot.on('TrackPlayerMovement', (user, position) => {
   if ('x' in position && 'y' in position && 'z' in position && 'facing' in position) {
     console.log(`${user.username} moved to ${position.x}, ${position.y}, ${position.z}, ${position.facing}`);
   } else if ('entity_id' in position && 'anchor_ix' in position) {
@@ -120,10 +120,16 @@ await bot.privilege.change(user.id, permissions);
 ```
 - Player List
 ```js
+// Directly from the api.
 await bot.room.players.fetch();
 await bot.room.players.getPosition(user.id);
 await bot.room.players.getId(user.username);
 await bot.room.players.getName(user.id);
+// Fetch data from the cache.
+await bot.room.players.cache.get();
+await bot.room.players.cache.position(user.id);
+await bot.room.players.cache.id(user.username);
+await bot.room.players.cache.username(user.id);
 ```
 - Client Control
 ```js
@@ -217,6 +223,7 @@ bot.on('playerLeave', (user) => {
  * Emitted when a player moves or teleports in the game.
  *
  * @event bot#TrackPlayerMovement
+ * @param {object} user - The user object containing the player's id and username. 
  * @param {object} position - The position object containing the player's location and facing direction.
  * @param {number} position.x - The X coordinate of the player's position.
  * @param {number} position.y - The Y coordinate of the player's position.
@@ -225,7 +232,7 @@ bot.on('playerLeave', (user) => {
  * @param {number} position.entity_id - The ID of the entity the player is moving towards.
  * @param {number} position.anchor_ix - The index of the anchor the player is moving towards.
  */
-bot.on('TrackPlayerMovement', (position) => {
+bot.on('TrackPlayerMovement', (user, position) => {
   if ('x' in position && 'y' in position && 'z' in position && 'facing' in position) {
     console.log(`${user.username} moved to ${position.x}, ${position.y}, ${position.z}, ${position.facing}`);
   } else if ('entity_id' in position && 'anchor_ix' in position) {
