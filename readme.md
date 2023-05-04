@@ -118,7 +118,7 @@ await bot.privilege.fetch(userIds);
 const permissions = { moderator: true, designer: true };
 await bot.privilege.change(user.id, permissions);
 ```
-- Player List
+- Player List & Cache
 ```js
 // Directly from the api.
 await bot.room.players.fetch();
@@ -225,6 +225,7 @@ bot.on('playerLeave', (user) => {
  * @event bot#TrackPlayerMovement
  * @param {object} user - The user object containing the player's id and username. 
  * @param {object} position - The position object containing the player's location and facing direction.
+ * @param {object} user - The user object containing the player's id and username. 
  * @param {number} position.x - The X coordinate of the player's position.
  * @param {number} position.y - The Y coordinate of the player's position.
  * @param {number} position.z - The Z coordinate of the player's position.
