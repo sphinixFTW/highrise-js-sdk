@@ -1,7 +1,6 @@
 const WebSocket = require('ws')
 const EventEmitter = require('events');
 const handleMessageEvent = require('./src/handlers/event');
-const { Message } = require('./src/actions/MessagesRequest');
 const { RoomUsers } = require('./src/actions/GetRoomUsersRequest');
 const { Walk } = require('./src/actions/FloorHitRequest');
 const { Wallet } = require('./src/actions/GetWalletRequest');
@@ -9,7 +8,7 @@ const { Mods } = require('./src/actions/RoomPrivilegeRequest');
 const { Indicator } = require('./src/actions/IndicatorRequest');
 const { Ping } = require('./src/actions/pingRequest');
 const { Users } = require('./src/actions/UsersRequest');
-const { InvalidUserIdError, InvalidMessageType, HighriseApiError } = require("./src/handlers/errors")
+const { InvalidUserIdError, InvalidMessageType } = require("./src/handlers/errors")
 const { ChatRequest } = require("./src/utils/models")
 require('colors')
 
@@ -35,12 +34,11 @@ class Highrise extends EventEmitter {
             },
         });
 
-        this.ws.setMaxListeners(50); // Set maximum number of listeners to 15
+        this.ws.setMaxListeners(50);
         this.ws.addEventListener('open', this.handleOpen.bind(this));
         this.ws.addEventListener('message', this.handleMessage.bind(this));
         this.ws.addEventListener('close', this.handleClose.bind(this));
         this.ws.addEventListener('error', this.handleError.bind(this));
-        //this.message = new Message(this)
         this.room = {
             players: new RoomUsers(this)
         };
@@ -54,12 +52,9 @@ class Highrise extends EventEmitter {
     }
 
     sendKeepalive() {
-        this.ws.send(JSON.stringify({ _type: 'KeepaliveRequest' }));
-        /*console.log(this.ws.listenerCount('message'));
-        const events = this.ws.eventNames();
-        for (const event of events) {
-            console.log(`Number of listeners for "${event}": ${this.ws.listenerCount(event)}`);
-        }*/
+        if (this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify({ _type: 'KeepaliveRequest' }));
+        }
         setTimeout(() => this.sendKeepalive(), 15000);
     }
 
@@ -78,7 +73,7 @@ class Highrise extends EventEmitter {
         clearTimeout(this.reconnectTimeout); // Clear the previous timeout, if any
 
         this.reconnectTimeout = setTimeout(() => {
-            this.reconnectTimeoutDuration *= 1; // Double the duration
+            this.reconnectTimeoutDuration *= 1; // Double the duration (set to 1 rn)
             this.ws = new WebSocket('wss://highrise.game/web/webapi', {
                 headers: {
                     'room-id': this.roomId,
@@ -101,11 +96,20 @@ class Highrise extends EventEmitter {
     }
 
     handleClose(event) {
-        if (event.code === 1000 && event.reason === '') {
+        if (event.code === 1000) {
+            // Normal closure
             const today = new Date().toLocaleString("en-us");
             console.error(`Connection closed with code ${event.code} at (${today})`.red);
             this.reconnect();
+        } else if (event.code === 1001) {
+            // Going Away
+            const today = new Date().toLocaleString("en-us");
+            console.error(`Connection closed with code ${event.code} (Going Away) at (${today})`.red);
+            this.reconnect();
         } else {
+            // Other event codes
+            const today = new Date().toLocaleString("en-us");
+            console.error(`Connection closed with unexpected code ${event.code} at (${today})`.red);
             this.reconnect();
         }
     }
@@ -145,6 +149,7 @@ class Highrise extends EventEmitter {
 
             if (this.ws.readyState !== WebSocket.OPEN) {
                 console.error('WebSocket is not open. Message cannot be sent.');
+                this.reconnect();
                 return;
             }
 
