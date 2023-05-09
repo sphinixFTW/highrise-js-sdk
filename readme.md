@@ -136,6 +136,9 @@ await bot.room.players.cache.username(user.id);
 bot.walk.send(x, y, z, facing);
 await bot.indicator.set(icon);
 await bot.ping.get();
+await bot.wallet.fetch();
+await bot.wallet.type();
+await bot.wallet.amount();
 ```
 ## **📚 More In Depth**
 ```js
