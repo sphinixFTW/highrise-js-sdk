@@ -1,10 +1,10 @@
 const { HighriseApiError, InvalidUserIdError, InvalidNameError } = require("../handlers/errors");
-const { GetRoomUsersRequest, sendPayloadAndGetResponse } = require("../utils/models");
+const { GetRoomUsersRequest, sendPayloadAndGetResponse, userMap } = require("../utils/models");
 
 class RoomUsers {
     constructor(bot) {
         this.bot = bot;
-        this.userMap = new Map();
+        this.userMap = userMap;
         this.reqId = Math.floor(Math.random() * 1000);
         this.bot.on('ready', async () => {
             try {

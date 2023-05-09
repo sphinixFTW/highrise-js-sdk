@@ -654,8 +654,8 @@ class MoveUserToRoomResponse {
 MoveUserToRoomResponse.Response = MoveUserToRoomResponse;
 MoveUserToRoomRequest.Response = MoveUserToRoomResponse;
 
-
-
+// create a new map for storing cache.
+const userMap = new Map();
 
 module.exports = {
     User,
@@ -679,5 +679,6 @@ module.exports = {
     generateRequestId,
     sendPayloadAndGetResponse,
     sendWalletPayloadAndGetResponse,
-    MoveUserToRoomRequest
+    MoveUserToRoomRequest,
+    userMap
 }

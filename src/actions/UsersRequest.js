@@ -1,5 +1,5 @@
 const { InvalidUserIdError, InvalidCoordinates, HighriseApiError, InvalidDuration, InvalidRoomId } = require("../handlers/errors");
-const { TeleportRequest, Position, ModerateRoomRequest, ReactionRequest, EmoteRequest, MoveUserToRoomRequest } = require("../utils/models");
+const { TeleportRequest, Position, ModerateRoomRequest, ReactionRequest, EmoteRequest, MoveUserToRoomRequest, userMap } = require("../utils/models");
 
 class Users {
     constructor(bot) {
@@ -253,6 +253,10 @@ class Users {
 
             requests.forEach(request => {
                 this.bot.ws.send(JSON.stringify(request), (error) => {
+                    const userData = userMap.get(request.user_id);
+                    if (userData) {
+                        userData.position = request.destination
+                    }
                     if (error) {
                         console.error('Error sending teleport request:'.red, error);
                         throw new HighriseApiError("Error sending TeleportRequest:".red);
