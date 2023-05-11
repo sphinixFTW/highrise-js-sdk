@@ -1,12 +1,12 @@
 const { InvalidCoordinates, HighriseApiError } = require("../handlers/errors");
-const { FloorHitRequest, Position } = require("../utils/models");
+const { FloorHitRequest, Position, AnchorPosition, AnchorHitRequest } = require("../utils/models");
 
-class Walk {
+class Move {
     constructor(bot) {
         this.bot = bot;
     }
 
-    send(x, y, z, facing = 'FrontLeft') {
+    walk(x, y, z, facing = 'FrontLeft') {
         try {
 
             if (!x || !y || !z) {
@@ -36,6 +36,35 @@ class Walk {
             console.error(error);
         }
     }
+
+    sit(entity_id, anchor_ix) {
+        try {
+            const entityIDString = String(entity_id);
+            const anchorIndex = parseInt(anchor_ix, 10);
+
+            if (!entityIDString || isNaN(anchorIndex)) {
+                throw new Error('Invalid entity ID or anchor index. Please provide valid values for entity_id and anchor_ix.'.red);
+            }
+
+            const dest = new AnchorPosition(entityIDString, anchorIndex);
+            const anchorHitRequest = new AnchorHitRequest(dest);
+
+            const payload = {
+                _type: 'AnchorHitRequest',
+                anchor: anchorHitRequest.anchor,
+                rid: anchorHitRequest.rid
+            };
+
+            this.bot.ws.send(JSON.stringify(payload), (error) => {
+                if (error) {
+                    console.error('Error anchor request:'.red, error);
+                    throw new HighriseApiError("Error sending AnchorHitRequest:".red);
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
 }
 
-module.exports = { Walk };
+module.exports = { Move };

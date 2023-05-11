@@ -18,7 +18,10 @@ function handleMessageEvent(event) {
     }
     if (data._type === 'SessionMetadata') {
         BotId = data.user_id;
-        this.emit('ready', BotId || null)
+        const rateLimits = data.rate_limits;
+        const connectionId = data.connection_id;
+        const sdkVersion = data.sdk_version;
+        this.emit('ready', BotId || null, rateLimits, connectionId, sdkVersion);
     }
     let user;
     let message;

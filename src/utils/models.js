@@ -394,6 +394,34 @@ class FloorHitRequest {
     }
 }
 
+class AnchorHitRequest {
+    /**
+     * Request to teleport to the specified anchor within the room.
+     * @param {string} destination The name or ID of the destination anchor
+     * @param {string|null} rid The ID of the room to teleport within
+     */
+    constructor(anchor, rid = null) {
+        this.anchor = anchor;
+        this.rid = rid;
+    }
+
+    static get AnchorHitResponse() {
+        class AnchorHitResponse {
+            /**
+             * The successful response to a `AnchorHitRequest`.
+             * @param {string|null} rid The ID of the room where the floor was hit
+             */
+            constructor(rid = null) {
+                this.rid = rid;
+            }
+        }
+        return AnchorHitResponse;
+    }
+
+    static get Response() {
+        return AnchorHitRequest.AnchorHitResponse;
+    }
+}
 
 class RoomPermissions {
     /**
@@ -680,5 +708,6 @@ module.exports = {
     sendPayloadAndGetResponse,
     sendWalletPayloadAndGetResponse,
     MoveUserToRoomRequest,
-    userMap
+    userMap,
+    AnchorHitRequest
 }

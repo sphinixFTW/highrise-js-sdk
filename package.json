@@ -1,6 +1,6 @@
 {
   "name": "highrise-js-sdk",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "A JavaScript library for writing and running Highrise bots.",
   "main": "index.js",
   "scripts": {

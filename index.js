@@ -2,7 +2,7 @@ const WebSocket = require('ws')
 const EventEmitter = require('events');
 const handleMessageEvent = require('./src/handlers/event');
 const { RoomUsers } = require('./src/actions/GetRoomUsersRequest');
-const { Walk } = require('./src/actions/FloorHitRequest');
+const { Move } = require('./src/actions/FloorHitRequest');
 const { Wallet } = require('./src/actions/GetWalletRequest');
 const { Mods } = require('./src/actions/RoomPrivilegeRequest');
 const { Indicator } = require('./src/actions/IndicatorRequest');
@@ -42,7 +42,7 @@ class Highrise extends EventEmitter {
         this.room = {
             players: new RoomUsers(this)
         };
-        this.walk = new Walk(this)
+        this.move = new Move(this)
         this.player = new Users(this)
         this.indicator = new Indicator(this)
         this.wallet = new Wallet(this);
@@ -53,7 +53,7 @@ class Highrise extends EventEmitter {
 
     sendKeepalive() {
         if (this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify({ _type: 'KeepaliveRequest' }));
+            this.ws.send(JSON.stringify({ _type: 'KeepaliveRequest', rid: null }));
         }
         setTimeout(() => this.sendKeepalive(), 15000);
     }

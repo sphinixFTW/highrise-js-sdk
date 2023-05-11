@@ -27,8 +27,8 @@ const bot = new Highrise(token, roomID);
 - ready
 ```js
 // Event emitted when the bot has successfully connected to the chat server.
-bot.on('ready', (client) => {
-  console.log(`The bot is now online: ${client}`)
+bot.on('ready', (BotId, rateLimits, connectionId, sdkVersion) => {
+  console.log(`The bot is now online: BotId=${BotId}, rateLimits=${rateLimits}, connectionId=${connectionId}, sdkVersion=${sdkVersion}`);
 });
 ```
 - chatMessageCreate
@@ -145,10 +145,13 @@ await bot.wallet.amount();
 /**
  * Event emitted when the bot has successfully connected to the chat server.
  * @event ready
- * @param {string} client - The ID of the bot client.
+ * @param {string} BotId - The ID of the bot.
+ * @param {object} rateLimits - The rate limits associated with the bot.
+ * @param {string} connectionId - The connection ID of the bot.
+ * @param {string} sdkVersion - The version of the SDK being used.
  */
-bot.on('ready', (client) => {
-  console.log(`The bot is now online: ${client}`)
+bot.on('ready', (BotId, rateLimits, connectionId, sdkVersion) => {
+  console.log(`The bot is now online: BotId=${BotId}, rateLimits=${rateLimits}, connectionId=${connectionId}, sdkVersion=${sdkVersion}`);
 });
 /**
  * Event emitted when a chat message is created.
@@ -358,7 +361,13 @@ await bot.ping.get();
  * @param {number} z - The z coordinate to move to
  * @param {number} facing - The direction the bot should be facing (in degrees)
  */
-bot.walk.send(x, y, z, facing);
+bot.move.walk(x, y, z, facing);
+/**
+ * Move the bot to a specific anchor position.
+ * @param {string} entity_id - The ID of the entity.
+ * @param {number} anchor_ix - The index of the anchor.
+ */
+bot.move.sit(entity_id, anchor_ix);
 /**
  * Set the bot's indicator icon
  * @param {string} icon - The name of the icon to set as the bot's indicator
