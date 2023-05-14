@@ -9,7 +9,7 @@ class Move {
     walk(x, y, z, facing = 'FrontLeft') {
         try {
 
-            if (!x || !y || !z) {
+            if (x === undefined || x === null || y === undefined || y === null || z === undefined || z === null) {
                 throw new InvalidCoordinates('Invalid coordinates. Please provide valid values for x, y, and z.'.red)
             }
 
