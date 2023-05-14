@@ -133,7 +133,8 @@ await bot.room.players.cache.username(user.id);
 ```
 - Client Control
 ```js
-bot.walk.send(x, y, z, facing);
+bot.move.walk(x, y, z, facing);
+bot.move.sit(entity_id, anchor_ix);
 await bot.indicator.set(icon);
 await bot.ping.get();
 await bot.wallet.fetch();
