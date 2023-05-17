@@ -10,7 +10,6 @@ class Mods {
         try {
             const request = new ChangeRoomPrivilegeRequest(user_id, permissions, this.bot.roomId);
             const payload = request.toPayload();
-            console.log(payload)
             this.bot.ws.send(JSON.stringify(payload));
         } catch (error) {
             console.error(error)
