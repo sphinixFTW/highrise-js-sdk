@@ -8,6 +8,7 @@ const { Mods } = require('./src/actions/RoomPrivilegeRequest');
 const { Indicator } = require('./src/actions/IndicatorRequest');
 const { Ping } = require('./src/actions/pingRequest');
 const { Users } = require('./src/actions/UsersRequest');
+const { AwaitEvents } = require("./src/actions/awaitEvents");
 const { InvalidUserIdError, InvalidMessageType } = require("./src/handlers/errors")
 const { ChatRequest } = require("./src/utils/models")
 require('colors')
@@ -42,13 +43,13 @@ class Highrise extends EventEmitter {
         this.room = {
             players: new RoomUsers(this)
         };
-        this.move = new Move(this)
-        this.player = new Users(this)
-        this.indicator = new Indicator(this)
+        this.move = new Move(this);
+        this.player = new Users(this);
+        this.indicator = new Indicator(this);
         this.wallet = new Wallet(this);
         this.privilege = new Mods(this);
-        this.ping = new Ping(this)
-
+        this.ping = new Ping(this);
+        this.chat = new AwaitEvents(this);
     }
 
     sendKeepalive() {
@@ -90,27 +91,34 @@ class Highrise extends EventEmitter {
 
     handleOpen() {
         const today = new Date().toLocaleString("en-us");
-        console.log(`Connected Using Highrise Javascript SDK at (${today})`.green);
+        const packageJson = require('./package.json');
+        const version = packageJson.version;
+
+        console.log(`Connected Using Highrise Javascript SDK (v${version}) at (${today})`.green);
         this.sendKeepalive();
         clearTimeout(this.reconnectTimeout);
     }
 
     handleClose(event) {
-        if (event.code === 1000) {
-            // Normal closure
-            const today = new Date().toLocaleString("en-us");
-            console.error(`Connection closed with code ${event.code} at (${today})`.red);
-            this.reconnect();
-        } else if (event.code === 1001) {
-            // Going Away
-            const today = new Date().toLocaleString("en-us");
-            console.error(`Connection closed with code ${event.code} (Going Away) at (${today})`.red);
-            this.reconnect();
-        } else {
-            // Other event codes
-            const today = new Date().toLocaleString("en-us");
-            console.error(`Connection closed with unexpected code ${event.code} at (${today})`.red);
-            this.reconnect();
+        const today = new Date().toLocaleString("en-us");
+
+        switch (event.code) {
+            case 1000:
+                console.log(`Connection closed with code ${event.code} at (${today}) - Normal closure`.green);
+                this.reconnect();
+                break;
+            case 1001:
+                console.log(`Connection closed with code ${event.code} at (${today}) - Going Away`.green);
+                this.reconnect();
+                break;
+            case 1006:
+                console.log(`Connection closed with code ${event.code} at (${today}) - Abnormal closure (no close frame received)`.red);
+                this.reconnect();
+                break;
+            default:
+                console.error(`Connection closed with unexpected code ${event.code} at (${today})`.red);
+                this.reconnect();
+                break;
         }
     }
 
