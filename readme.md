@@ -27,8 +27,8 @@ const bot = new Highrise(token, roomID);
 - ready
 ```js
 // Event emitted when the bot has successfully connected to the chat server.
-bot.on('ready', (BotId, rateLimits, connectionId, sdkVersion) => {
-  console.log(`The bot is now online: BotId=${BotId}, rateLimits=${rateLimits}, connectionId=${connectionId}, sdkVersion=${sdkVersion}`);
+bot.on('ready', (BotId, rateLimits, connectionId, version) => {
+  console.log(`The bot is now online: BotId=${BotId}, rateLimits=${rateLimits}, connectionId=${connectionId}, sdkVersion=${version}`);
 });
 ```
 - chatMessageCreate
@@ -96,6 +96,16 @@ bot.on('TrackPlayerMovement', (user, position) => {
 ```js
 bot.message.send(message);
 bot.whisper.send(user.id, message);
+
+const filter = (u) => u.id === user.id;
+bot.chat.awaitMessages({ filter: filter, max: 1, idle: 1000 }).then((response) => {
+  console.log(response);
+});
+
+const filter = (s, r) => s.id === user.id && r.id === 'id';
+bot.chat.awaitReactions({ filter: filter, max: 1, idle: 1000 }).then((reaction) => {
+  console.log(reaction);
+});
 ```
 - player control
 ```js
@@ -258,6 +268,28 @@ bot.whisper.send(user.id, 'message')
  * @param {string} message - The message to send.
  */
 bot.message.send('message')
+/**
+ * Awaits and logs the response message from the bot's chat.
+ *
+ * @param {Object} bot - The bot instance.
+ * @param {Object} user - The user object.
+ */
+const filter = (u) => u.id === user.id;
+bot.chat.awaitMessages({ filter: filter, max: 1, idle: 1000 }).then((response) => {
+  console.log(response);
+});
+
+/**
+ * Awaits and logs the reaction from the bot's chat.
+ *
+ * @param {Object} bot - The bot instance.
+ * @param {Object} user - The user object.
+ */
+const filter = (s, r) => s.id === user.id && r.id === 'id';
+bot.chat.awaitReactions({ filter: filter, max: 1, idle: 1000 }).then((reaction) => {
+  console.log(reaction);
+});
+
 /**
  * Fetches information about all players in the current room.
  * @returns {Promise<Object[]>} - A promise that resolves with an array of player objects.
