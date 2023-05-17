@@ -20,8 +20,9 @@ function handleMessageEvent(event) {
         BotId = data.user_id;
         const rateLimits = data.rate_limits;
         const connectionId = data.connection_id;
-        const sdkVersion = data.sdk_version;
-        this.emit('ready', BotId || null, rateLimits, connectionId, sdkVersion);
+        const packageJson = require('../../package.json');
+        const version = packageJson.version;
+        this.emit('ready', BotId || null, rateLimits, connectionId, version);
     }
     let user;
     let message;
