@@ -30,14 +30,14 @@ class AwaitEvents {
       let collected = [];
 
       const listener = (user, message) => {
-        if (!filter || filter(user)) {
+        if ((!filter || filter(user, message)) && collected.length < max) {
           collected.push({ user, message });
+        }
 
-          if (collected.length >= max) {
-            clearTimeout(timer);
-            this.removeMessageListener(listener);
-            resolve(collected);
-          }
+        if (collected.length >= max) {
+          clearTimeout(timer);
+          this.removeMessageListener(listener);
+          resolve(collected);
         }
       };
 
@@ -63,7 +63,7 @@ class AwaitEvents {
 
           if (collected.length >= max) {
             clearTimeout(timer);
-            this.removeMessageListener(listener);
+            this.removeReactionListener(listener);
             resolve(collected);
           }
         }
@@ -72,17 +72,17 @@ class AwaitEvents {
       this.addReactionListener(listener);
 
       timer = setTimeout(() => {
-        this.removereactionListener(listener);
+        this.removeReactionListener(listener);
         resolve([]); // Return an empty array to indicate no matching reactions
       }, idle);
     });
   }
 
   addReactionListener(listener) {
-    this.reactionListeners.set(listener, true)
+    this.reactionListeners.set(listener, true);
   }
 
-  removereactionListener(listener) {
+  removeReactionListener(listener) {
     this.reactionListeners.delete(listener);
   }
 
