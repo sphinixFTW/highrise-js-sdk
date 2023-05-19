@@ -115,6 +115,18 @@ class Highrise extends EventEmitter {
                 console.log(`Connection closed with code ${event.code} at (${today}) - Abnormal closure (no close frame received)`.red);
                 this.reconnect();
                 break;
+            case 1005:
+                console.log(`Connection closed with code ${event.code} at (${today}) - No status received`.red);
+                this.reconnect();
+                break;
+            case 1008:
+                console.log(`Connection closed with code ${event.code} at (${today}) - Policy Violation`.red);
+                this.reconnect();
+                break;
+            case 1011:
+                console.log(`Connection closed with code ${event.code} at (${today}) - Unexpected condition prevented the request from being fulfilled`.red);
+                this.reconnect();
+                break;
             default:
                 console.error(`Connection closed with unexpected code ${event.code} at (${today})`.red);
                 this.reconnect();
