@@ -25,6 +25,19 @@ class InvalidUserIdError extends Error {
 }
 
 /**
+ * Error class for Invalid Facing errors.
+ * @class
+ * @extends Error
+ * @param {string} message - The error message.
+*/
+class InvalidFacingError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'InvalidFacingError';
+    }
+}
+
+/**
  * Error class for Invalid User Name errors.
  * @class
  * @extends Error
@@ -129,5 +142,6 @@ module.exports = {
     InvalidEmoteId,
     InvalidMessageType,
     InvalidCoordinates,
-    InvalidRoomId
+    InvalidRoomId,
+    InvalidFacingError
 }
