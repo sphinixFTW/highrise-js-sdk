@@ -1,4 +1,4 @@
-const { InvalidUserIdError, InvalidCoordinates, HighriseApiError, InvalidDuration, InvalidRoomId } = require("../handlers/errors");
+const { InvalidUserIdError, InvalidCoordinates, HighriseApiError, InvalidDuration, InvalidRoomId, InvalidFacingError } = require("../handlers/errors");
 const { TeleportRequest, Position, ModerateRoomRequest, ReactionRequest, EmoteRequest, MoveUserToRoomRequest, userMap } = require("../utils/models");
 
 class Users {
@@ -208,18 +208,26 @@ class Users {
 
     async teleport(userIds, x, y, z, facing) {
         try {
+            const validFacing = ['BackLeft', 'BackRight', 'FrontLeft', 'FrontRight'];
+
             if (!Array.isArray(userIds)) {
                 userIds = [userIds];
             }
+
             if (userIds.some(userId => !userId || userId === undefined || userId === null)) {
                 throw new InvalidUserIdError('Invalid user ID. Please provide valid value(s) for user ID.'.red);
             }
+
             if (x === undefined || x === null || y === undefined || y === null || z === undefined || z === null) {
-                throw new InvalidCoordinates('Invalid coordinates. Please provide valid values for x, y, and z.'.red)
+                throw new InvalidCoordinates('Invalid coordinates. Please provide valid values for x, y, and z.'.red);
             }
 
             if (typeof facing !== 'string') {
-                throw new Error('Invalid facing parameter. Must be a string.'.red);
+                throw new InvalidFacingError('Invalid facing parameter. It must be a string.'.red);
+            }
+
+            if (!validFacing.includes(facing)) {
+                throw new InvalidFacingError(`Invalid facing parameter (${facing})`.red + `\n` + 'Available Facing Options:'.green + '\n' + `${validFacing.join("\n")}`);
             }
 
             const dest = new Position(x, y, z, facing);
@@ -228,6 +236,7 @@ class Users {
             console.error(error);
         }
     }
+
 
     sendTeleport(userIds, dest) {
         try {
