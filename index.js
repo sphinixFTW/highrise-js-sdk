@@ -116,7 +116,7 @@ class Highrise extends EventEmitter {
                 this.reconnect();
                 break;
             case 1005:
-                console.log(`Connection closed with code ${event.code} at (${today}) - No status received`.red);
+                console.log(`Connection closed with code ${event.code} at (${today}) - No status received`.yellow);
                 this.reconnect();
                 break;
             case 1008:
