@@ -1,9 +1,56 @@
 const { InvalidUserIdError, InvalidCoordinates, HighriseApiError, InvalidDuration, InvalidRoomId, InvalidFacingError } = require("../handlers/errors");
-const { TeleportRequest, Position, ModerateRoomRequest, ReactionRequest, EmoteRequest, MoveUserToRoomRequest, userMap } = require("../utils/models");
+const { TeleportRequest, Position, ModerateRoomRequest, ReactionRequest, EmoteRequest, MoveUserToRoomRequest, userMap, InviteSpeakerRequest, RemoveSpeakerRequest } = require("../utils/models");
 
 class Users {
     constructor(bot) {
         this.bot = bot;
+    }
+
+    voice = {
+        add: async (user_id) => {
+            try {
+                if (!user_id || typeof user_id !== 'string') {
+                    throw new InvalidUserIdError('Invalid user ID');
+                }
+
+                // Create an instance of InviteSpeakerRequest
+                const inviteRequest = new InviteSpeakerRequest(user_id);
+
+                // Create the payload using the request object
+                const payload = {
+                    _type: 'InviteSpeakerRequest',
+                    ...inviteRequest
+                };
+
+                // Send the invite request
+                this.bot.ws.send(JSON.stringify(payload));
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        remove: async (user_id) => {
+            try {
+                if (!user_id || typeof user_id !== 'string') {
+                    throw new InvalidUserIdError('Invalid user ID');
+                }
+
+                // Create an instance of RemoveSpeakerRequest
+                const removeRequest = new RemoveSpeakerRequest(user_id);
+
+                // Create the payload using the request object
+                const payload = {
+                    _type: 'RemoveSpeakerRequest',
+                    ...removeRequest
+                };
+
+                // Send the remove request
+                this.bot.ws.send(JSON.stringify(payload));
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
     }
 
     async react(targetUserId, reaction) {

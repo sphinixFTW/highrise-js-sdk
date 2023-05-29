@@ -1,6 +1,5 @@
-const { User, Position, AnchorPosition } = require("../utils/models")
-
-let BotId;
+const { User, Position, AnchorPosition, SessionMetadata } = require("../utils/models")
+const packageJson = require('../../package.json');
 
 /**
  * Handle incoming chat events, user joined events, user left events, emote events, reaction events, tip reaction events, and user moved events.
@@ -10,34 +9,27 @@ let BotId;
 function handleMessageEvent(event) {
     const data = JSON.parse(event.data);
     // Check the _type field to determine what type of message we received
-    if (data._type !== 'KeepaliveResponse') {
-        /*const sessionMetadata = JSON.parse(event.data);
-        for (const prop in sessionMetadata) {
-            console.log(`${prop + ': ' + sessionMetadata[prop]}`.yellow);
-        }*/
-    }
     if (data._type === 'SessionMetadata') {
-        BotId = data.user_id;
-        const rateLimits = data.rate_limits;
-        const connectionId = data.connection_id;
-        const packageJson = require('../../package.json');
         const version = packageJson.version;
-        this.emit('ready', BotId || null, rateLimits, connectionId, version);
+        const sessionMetadata = new SessionMetadata(
+            data.user_id,
+            data.room_info,
+            data.rate_limits,
+            data.connection_id,
+            version
+        );
+        this.emit('ready', sessionMetadata); // Emit the 'ready' event with sessionMetadata
     }
     let user;
     let message;
-    if (data._type === 'ChatEvent' && data.user.id !== BotId) {
-        // If a chat event was received and the sender is not the bot, create a User object
+    if (data._type === 'ChatEvent') {
+        // If a chat event was received, create a User object
         // and extract the message content
         user = new User(data.user.id, data.user.username);
         message = typeof data.message === 'string' ? data.message : data.message.text;
 
         if (data.whisper === false) {
             // If the message was not a whisper, emit a chatMessageCreate event for the user and message
-            // but ignore the message if the sender is the bot
-            if (user.id === this.botUserId) {
-                return; // Exit if the user is the bot
-            }
             this.emit('chatMessageCreate', user, message);
         } else {
             // If the message was a whisper, emit a whisperMessageCreate event for the user and message
@@ -83,8 +75,21 @@ function handleMessageEvent(event) {
             const anchor = new AnchorPosition(data.position.entity_id, data.position.anchor_ix);
             this.emit('TrackPlayerMovement', user, anchor);
         }
-    }
+    } else // Check if the received data type is 'VoiceEvent'
+        if (data._type === 'VoiceEvent') {
+            // Destructure the 'users' and 'seconds_left' properties from the data object
+            const { users, seconds_left } = data;
 
+            // Format the users data
+            const formattedUsers = users.map(([userData, status]) => ({
+                // Create a new User instance with the user ID and username
+                user: new User(userData.id, userData.username),
+                status: status
+            }));
+
+            // Emit the 'voiceChatCreate' event with the formatted users data and seconds_left
+            this.emit('voiceChatCreate', formattedUsers, seconds_left);
+        }
 }
 
 module.exports = handleMessageEvent;

@@ -31,8 +31,8 @@ const bot = new Highrise(token, roomID);
 - ready
 ```js
 // Event emitted when the bot has successfully connected to the chat server.
-bot.on('ready', (BotId, rateLimits, connectionId, version) => {
-  console.log(`The bot is now online: BotId=${BotId}, rateLimits=${rateLimits.client}, connectionId=${connectionId}, sdkVersion=${version}`);
+bot.on('ready', (session) => {
+  console.log(`Bot is now online in ${session.room_info.room_name}.\nBot ID: ${session.user_id}\nOwner ID: ${session.room_info.owner_id}\nRate Limits: ${session.rate_limits.client}\nConnection ID: ${session.connection_id}\nSDK Version: ${session.sdk_version}`)
 });
 ```
 - chatMessageCreate
@@ -93,6 +93,20 @@ bot.on('TrackPlayerMovement', (user, position) => {
   } else if ('entity_id' in position && 'anchor_ix' in position) {
     console.log(`${user.username} moved to anchor ${position.entity_id} at index ${position.anchor_ix}`);
   }
+});
+```
+- voiceChatCreate
+```js
+// Emitted when a player change their voice status in the game.
+bot.on('voiceChatCreate', (users, seconds_left) => {
+  console.log(`Seconds Left: ${seconds_left}`)
+  console.log('Users:');
+  users.forEach(({ user, status }) => {
+    console.log('User ID:', user.id);
+    console.log('Username:', user.username);
+    console.log('Status:', status);
+    console.log('---');
+  });
 });
 ```
 

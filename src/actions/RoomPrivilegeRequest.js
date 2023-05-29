@@ -1,21 +1,75 @@
 const { InvalidUserIdError, HighriseApiError } = require("../handlers/errors");
-const { GetRoomPrivilegeRequest, RoomPermissions, ChangeRoomPrivilegeRequest } = require("../utils/models");
+const { GetRoomPrivilegeRequest, RoomPermissions } = require("../utils/models");
 
 class Mods {
     constructor(bot) {
         this.bot = bot;
     }
 
-    async change(user_id, permissions) {
-        try {
-            const request = new ChangeRoomPrivilegeRequest(user_id, permissions, this.bot.roomId);
-            const payload = request.toPayload();
-            this.bot.ws.send(JSON.stringify(payload));
-        } catch (error) {
-            console.error(error)
+    moderator = {
+        add: async (user_id) => {
+            if (!user_id || typeof user_id !== 'string') {
+                throw new InvalidUserIdError('Invalid user ID. Please provide valid value for user ID.'.red);
+            }
+            try {
+                const permissions = { moderator: true };
+                await this.change(user_id, permissions);
+            } catch (error) {
+                throw new InvalidUserIdError(`No user found with the ID "${user_id}".`);
+            }
+        },
+        remove: async (user_id) => {
+            if (!user_id || typeof user_id !== 'string') {
+                throw new InvalidUserIdError('Invalid user ID. Please provide valid value for user ID.'.red);
+            }
+            try {
+                const permissions = { moderator: false };
+                await this.change(user_id, permissions);
+            } catch (error) {
+                throw new InvalidUserIdError(`No user found with the ID "${user_id}".`);
+            }
         }
     }
 
+    designer = {
+        add: async (user_id) => {
+            if (!user_id || typeof user_id !== 'string') {
+                throw new InvalidUserIdError('Invalid user ID. Please provide valid value for user ID.'.red);
+            }
+            try {
+                const permissions = { designer: true };
+                await this.change(user_id, permissions);
+            } catch (error) {
+                throw new InvalidUserIdError(`No user found with the ID "${user_id}".`);
+            }
+        },
+        remove: async (user_id) => {
+            if (!user_id || typeof user_id !== 'string') {
+                throw new InvalidUserIdError('Invalid user ID. Please provide valid value for user ID.'.red);
+            }
+            try {
+                const permissions = { designer: false };
+                await this.change(user_id, permissions);
+            } catch (error) {
+                throw new InvalidUserIdError(`No user found with the ID "${user_id}".`);
+            }
+        }
+    }
+
+
+    async change(userId, permissions) {
+        try {
+            const payload = {
+                _type: 'ChangeRoomPrivilegeRequest',
+                user_id: userId,
+                permissions: permissions,
+                rid: this.bot.roomId
+            };
+            this.bot.ws.send(JSON.stringify(payload));
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     async fetch(userIds) {
         try {

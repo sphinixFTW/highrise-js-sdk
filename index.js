@@ -6,6 +6,7 @@ const { Move } = require('./src/actions/FloorHitRequest');
 const { Wallet } = require('./src/actions/GetWalletRequest');
 const { Mods } = require('./src/actions/RoomPrivilegeRequest');
 const { Indicator } = require('./src/actions/IndicatorRequest');
+const { VoiceChat } = require('./src/actions/GetVoiceChatRequest');
 const { Ping } = require('./src/actions/pingRequest');
 const { Users } = require('./src/actions/UsersRequest');
 const { AwaitEvents } = require("./src/actions/awaitEvents");
@@ -35,13 +36,14 @@ class Highrise extends EventEmitter {
             },
         });
 
-        this.ws.setMaxListeners(50);
+        this.ws.setMaxListeners(16);
         this.ws.addEventListener('open', this.handleOpen.bind(this));
         this.ws.addEventListener('message', this.handleMessage.bind(this));
         this.ws.addEventListener('close', this.handleClose.bind(this));
         this.ws.addEventListener('error', this.handleError.bind(this));
         this.room = {
-            players: new RoomUsers(this)
+            players: new RoomUsers(this),
+            voice: new VoiceChat(this)
         };
         this.move = new Move(this);
         this.player = new Users(this);
@@ -74,7 +76,7 @@ class Highrise extends EventEmitter {
         clearTimeout(this.reconnectTimeout); // Clear the previous timeout, if any
 
         this.reconnectTimeout = setTimeout(() => {
-            this.reconnectTimeoutDuration *= 1; // Double the duration (set to 1 rn)
+            this.reconnectTimeoutDuration *= 2; // Double the duration (set to 1 rn)
             this.ws = new WebSocket('wss://highrise.game/web/webapi', {
                 headers: {
                     'room-id': this.roomId,

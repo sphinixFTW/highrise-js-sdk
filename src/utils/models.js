@@ -508,48 +508,6 @@ class ModerateRoomRequest {
     }
 }
 
-
-class ChangeRoomPrivilegeRequest {
-    /**
-     * Change the room privileges for provided `user_id`.
-     * This can be used to both give and take moderation and designer privileges for current room.
-     *
-     * Bots have to be in the room to change privileges.
-     * Bots are using their owner's privileges.
-     * @param {string} user_id The ID of the user to change privileges for
-     * @param {RoomPermissions} permissions The new permissions to set for the user
-     * @param {string|null} rid The ID of the room to change privileges in (optional)
-     */
-    constructor(user_id, permissions, rid = null) {
-        this.user_id = user_id;
-        this.permissions = permissions;
-        this.rid = rid;
-    }
-
-    static get Response() {
-        class ChangeRoomPrivilegeResponse {
-            /**
-             * The successful response to a `ChangeRoomPrivilegeRequest`.
-             * @param {string} rid The ID of the room where the privileges were changed
-             */
-            constructor(rid) {
-                this.rid = rid;
-            }
-        }
-
-        return ChangeRoomPrivilegeResponse;
-    }
-
-    toPayload() {
-        return {
-            _type: 'ChangeRoomPrivilegeRequest',
-            user_id: this.user_id,
-            permissions: this.permissions,
-            rid: this.rid
-        };
-    }
-}
-
 function generateRequestId() {
     return Math.random().toString(36).substr(2, 9);
 }
@@ -630,6 +588,37 @@ class sendWalletPayloadAndGetResponse {
     }
 }
 
+class RoomInfo {
+    /**
+     * Information about the room.
+     * @param {string} owner_id - The ID of the room owner.
+     * @param {string} room_name - The name of the room.
+     */
+    constructor(owner_id, room_name) {
+        this.owner_id = owner_id;
+        this.room_name = room_name;
+    }
+}
+
+class SessionMetadata {
+    /**
+     * Initial session data.
+     * @param {string} user_id - The bot's user ID.
+     * @param {RoomInfo} room_info - Additional information about the connected room.
+     * @param {Object.<string, [number, number]>} rate_limits - A dictionary of rate limits,
+     *                                                        with the key as the rate limit name
+     *                                                        and the value as a tuple of (limit, period).
+     * @param {string} connection_id - The connection ID of the WebSocket used in the bot connection.
+     * @param {string|null} sdk_version - The SDK version recommended by the server (if applicable).
+     */
+    constructor(user_id, room_info, rate_limits, connection_id, sdk_version = null) {
+        this.user_id = user_id;
+        this.room_info = room_info;
+        this.rate_limits = rate_limits;
+        this.connection_id = connection_id;
+        this.sdk_version = sdk_version;
+    }
+}
 
 class MoveUserToRoomRequest {
     /**
@@ -679,6 +668,94 @@ class MoveUserToRoomResponse {
     }
 }
 
+class CheckVoiceChatRequest {
+    /**
+     * Check the voice chat status in the room.
+     *
+     * @param {string|null} rid The ID of the room to check the voice chat status in (optional).
+     */
+    constructor(rid = null) {
+        this.rid = rid;
+    }
+
+    static get Response() {
+        class CheckVoiceChatResponse {
+            /**
+             * Returns the status of voice chat in the room.
+             *
+             * @param {number} seconds_left The number of seconds left until the voice chat ends.
+             * @param {Set<string>} auto_speakers The list of users that automatically have voice chat privileges in the room like moderators and owner.
+             * @param {Object<string, 'invited' | 'voice' | 'muted'>} users The list of users that currently have voice chat privileges in the room.
+             * @param {string|null} rid The ID of the room where the voice chat status was checked (optional).
+             */
+            constructor(seconds_left, auto_speakers, users, rid = null) {
+                this.seconds_left = seconds_left;
+                this.auto_speakers = auto_speakers;
+                this.users = users;
+                this.rid = rid;
+            }
+        }
+
+        return CheckVoiceChatResponse;
+    }
+}
+
+class InviteSpeakerRequest {
+    /**
+     * Invite a user to speak in the room.
+     *
+     * @param {string} user_id The ID of the user to invite.
+     * @param {string|null} rid The ID of the room to invite the user to (optional).
+     */
+    constructor(user_id, rid = null) {
+        this.user_id = user_id;
+        this.rid = rid;
+    }
+
+    static get Response() {
+        class InviteSpeakerResponse {
+            /**
+             * The response to an `InviteSpeakerRequest`.
+             *
+             * @param {string|null} rid The ID of the room where the user was invited to (optional).
+             */
+            constructor(rid = null) {
+                this.rid = rid;
+            }
+        }
+
+        return InviteSpeakerResponse;
+    }
+}
+
+class RemoveSpeakerRequest {
+    /**
+     * Remove a user from speaking in the room.
+     *
+     * @param {string} user_id The ID of the user to remove from speaking.
+     * @param {string|null} rid The ID of the room to remove the user from (optional).
+     */
+    constructor(user_id, rid = null) {
+        this.user_id = user_id;
+        this.rid = rid;
+    }
+
+    static get Response() {
+        class RemoveSpeakerResponse {
+            /**
+             * The response to a `RemoveSpeakerRequest`.
+             *
+             * @param {string|null} rid The ID of the room from which the user was removed (optional).
+             */
+            constructor(rid = null) {
+                this.rid = rid;
+            }
+        }
+
+        return RemoveSpeakerResponse;
+    }
+}
+
 MoveUserToRoomResponse.Response = MoveUserToRoomResponse;
 MoveUserToRoomRequest.Response = MoveUserToRoomResponse;
 
@@ -703,11 +780,15 @@ module.exports = {
     GetRoomPrivilegeRequest,
     IndicatorRequest,
     ModerateRoomRequest,
-    ChangeRoomPrivilegeRequest,
     generateRequestId,
     sendPayloadAndGetResponse,
     sendWalletPayloadAndGetResponse,
     MoveUserToRoomRequest,
     userMap,
-    AnchorHitRequest
+    AnchorHitRequest,
+    RoomInfo,
+    SessionMetadata,
+    CheckVoiceChatRequest,
+    InviteSpeakerRequest,
+    RemoveSpeakerRequest
 }
