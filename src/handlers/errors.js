@@ -5,143 +5,143 @@
  * @param {string} message - The error message.
 */
 class HighriseApiError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'HighriseApiError';
-    }
+  constructor(message) {
+    super(message);
+    this.name = 'HighriseApiError';
+  }
 }
 
 /**
- * Error class for Invalid User ID errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
+* Error class for Invalid User ID errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
 */
 class InvalidUserIdError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidUserIdError';
-    }
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidUserIdError';
+  }
 }
 
 /**
- * Error class for Invalid Facing errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
+* Error class for Invalid Facing errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
 */
 class InvalidFacingError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidFacingError';
-    }
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidFacingError';
+  }
 }
 
 /**
- * Error class for Invalid User Name errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
+* Error class for Invalid User Name errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
 */
 class InvalidNameError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidNameError';
-    }
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidNameError';
+  }
 }
 
 /**
- * Error class for Invalid Player errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
- */
+* Error class for Invalid Player errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
 class InvalidPlayer extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidPlayer';
-    }
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidPlayer';
+  }
 }
 
 /**
- * Error class for Invalid Duration errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
- */
-class InvalidDuration extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidDuration'
-    }
-}
-
-
-/**
- * Error class for Invalid Emote ID errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
- */
-class InvalidEmoteId extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidEmoteId'
-    }
+* Error class for Invalid Duration errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidDurationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidDurationError'
+  }
 }
 
 
 /**
- * Error class for Invalid Message Type errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
- */
-class InvalidMessageType extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidMessageType'
-    }
+* Error class for Invalid Emote ID errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidEmoteIdError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidEmoteId'
+  }
 }
 
 
 /**
- * Error class for Invalid Coordinates errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
- */
-class InvalidCoordinates extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidCoordinates'
-    }
+* Error class for Invalid Message Type errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidMessageTypeError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidMessageTypeError'
+  }
 }
 
 
 /**
- * Error class for Invalid Room ID errors.
- * @class
- * @extends Error
- * @param {string} message - The error message.
- */
-class InvalidRoomId extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'InvalidRoomId'
-    }
+* Error class for Invalid Coordinates errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidCoordinatesError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidCoordinatesError'
+  }
+}
+
+
+/**
+* Error class for Invalid Room ID errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidRoomIdError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidRoomIdError'
+  }
 }
 
 
 module.exports = {
-    HighriseApiError,
-    InvalidNameError,
-    InvalidPlayer,
-    InvalidUserIdError,
-    InvalidDuration,
-    InvalidEmoteId,
-    InvalidMessageType,
-    InvalidCoordinates,
-    InvalidRoomId,
-    InvalidFacingError
+  HighriseApiError,
+  InvalidNameError,
+  InvalidPlayer,
+  InvalidUserIdError,
+  InvalidDurationError,
+  InvalidEmoteIdError,
+  InvalidMessageTypeError,
+  InvalidCoordinatesError,
+  InvalidRoomIdError,
+  InvalidFacingError
 }

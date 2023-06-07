@@ -3,9 +3,13 @@ class AwaitEvents {
     this.bot = bot;
     this.messageListeners = new Map();
     this.reactionListeners = new Map();
-    this.bot.on('chatMessageCreate', this.handleChatMessageCreate.bind(this));
-    this.bot.on('whisperMessageCreate', this.handleChatMessageCreate.bind(this));
-    this.bot.on('reactionCreate', this.handleReactionCreate.bind(this));
+    if (this.bot.eventTypesOfInterest.includes('messages')) {
+      this.bot.on('chatMessageCreate', this.handleChatMessageCreate.bind(this));
+      this.bot.on('whisperMessageCreate', this.handleChatMessageCreate.bind(this));
+    }
+    if (this.bot.eventTypesOfInterest.includes('reactionCreate')) {
+      this.bot.on('reactionCreate', this.handleReactionCreate.bind(this));
+    }
   }
 
   handleChatMessageCreate(user, message) {

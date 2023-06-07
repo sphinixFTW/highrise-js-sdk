@@ -20,7 +20,16 @@ npm i highrise-js-sdk@latest
 ## **📥 Class Import**
 ```js
 const { Highrise } = require("highrise-js-sdk")
-const bot = new Highrise(token, roomID);
+
+const settings = {
+  token: 'EXAMPLE-TOKEN',
+  room: 'EXAMPLE-ROOM',
+  events: ['ready', 'playerJoin', 'playerLeave', 'messages'],
+  reconnect: 5
+}
+
+const client = new Highrise({ events: settings.events }, settings.reconnect);
+client.login(settings.token, settings.room);
 ```
 ## **📘 Documentation**
 
@@ -31,63 +40,70 @@ const bot = new Highrise(token, roomID);
 - ready
 ```js
 // Event emitted when the bot has successfully connected to the chat server.
-bot.on('ready', (session) => {
+client.on('ready', (session) => {
   console.log(`Bot is now online in ${session.room_info.room_name}.\nBot ID: ${session.user_id}\nOwner ID: ${session.room_info.owner_id}\nRate Limits: ${session.rate_limits.client}\nConnection ID: ${session.connection_id}\nSDK Version: ${session.sdk_version}`)
 });
+```
+- error
+```js
+// Event emitted when an error occurs within the package.
+client.on('error', (error) => {
+  console.log("An Error Occured:", error);
+})
 ```
 - chatMessageCreate
 ```js
 // Event emitted when a chat message is created.
-bot.on('chatMessageCreate', (user, message) => {
+client.on('chatMessageCreate', (user, message) => {
   console.log(`[${user.username}]: ${message}`);
 });
 ```
 - whisperMessageCreate
 ```js
 // Event emitted when a whisper message is created.
-bot.on('whisperMessageCreate', (user, message) => {
+client.on('whisperMessageCreate', (user, message) => {
   console.log(`[${user.username}] (whisper): ${message}`);
 });
 ```
 - emoteCreate
 ```js
 // Event emitted when an emote is created.
-bot.on('emoteCreate', (sender, receiver, emote) => {
+client.on('emoteCreate', (sender, receiver, emote) => {
   console.log(`${sender.username} sent ${emote} to ${receiver.username}`);
 });
 ```
 - reactionCreate
 ```js
 // Event emitted when a reaction is created.
-bot.on('reactionCreate', (sender, receiver, reaction) => {
+client.on('reactionCreate', (sender, receiver, reaction) => {
   console.log(`${sender.username} sent ${reaction} to ${receiver.username}`);
 });
 ```
 - tipReactionCreate
 ```js
 // Event emitted when a tip reaction is created.
-bot.on('tipReactionCreate', (sender, receiver, item) => {
+client.on('tipReactionCreate', (sender, receiver, item) => {
   console.log(`Tip reaction from ${sender.username} to ${receiver.username}: ${item.amount} ${item.type}`);
 });
 ```
 - playerJoin
 ```js
 // Emitted when a player joins the room.
-bot.on('playerJoin', (user) => {
+client.on('playerJoin', (user) => {
   console.log(`${user.username}(${user.id}) Joined the room`);
 });
 ```
 - playerLeave
 ```js
 // Emitted when a player leaves the room.
-bot.on('playerLeave', (user) => {
+client.on('playerLeave', (user) => {
   console.log(`${user.username}(${user.id}) Left the room`);
 });
 ```
-- TrackPlayerMovement
+- trackPlayerMovement
 ```js
 // Emitted when a player moves or teleports in the game.
-bot.on('TrackPlayerMovement', (user, position) => {
+client.on('trackPlayerMovement', (user, position) => {
   if ('x' in position && 'y' in position && 'z' in position && 'facing' in position) {
     console.log(`${user.username} moved to ${position.x}, ${position.y}, ${position.z}, ${position.facing}`);
   } else if ('entity_id' in position && 'anchor_ix' in position) {
@@ -98,7 +114,7 @@ bot.on('TrackPlayerMovement', (user, position) => {
 - voiceChatCreate
 ```js
 // Emitted when a player change their voice status in the game.
-bot.on('voiceChatCreate', (users, seconds_left) => {
+client.on('voiceChatCreate', (users, seconds_left) => {
   console.log(`Seconds Left: ${seconds_left}`)
   console.log('Users:');
   users.forEach(({ user, status }) => {

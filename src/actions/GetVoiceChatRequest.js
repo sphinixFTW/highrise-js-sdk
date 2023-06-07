@@ -1,42 +1,34 @@
-const { CheckVoiceChatRequest } = require("../utils/models");
 const { HighriseApiError } = require("../handlers/errors");
+const { SendPayloadAndGetResponse, CheckVoiceChatRequest } = require("../models/models");
 
 class VoiceChat {
   constructor(bot) {
     this.bot = bot;
+    this.reqId = Math.floor(Math.random() * 1000);
   }
 
-  fetch() {
-    return new Promise((resolve, reject) => {
-      const request = new CheckVoiceChatRequest();
+  async fetch() {
+
+    try {
+      const sendPayloadAndGetResponse = new SendPayloadAndGetResponse(this.bot);
+      const checkVoiceChatRequest = new CheckVoiceChatRequest(this.reqId.toString());
 
       const payload = {
         _type: 'CheckVoiceChatRequest',
-        rid: request.rid,
+        rid: checkVoiceChatRequest.rid
       };
 
-      const responseHandler = (response) => {
-        if (
-          response &&
-          response._type === 'CheckVoiceChatResponse'
-        ) {
-          const { seconds_left, auto_speakers, users } = response;
-          resolve({ seconds_left, auto_speakers, users });
-        } else {
-          reject(new HighriseApiError('Invalid response received.'));
-        }
-      };
+      const response = await sendPayloadAndGetResponse.sendPayloadAndGetResponse(
+        payload,
+        CheckVoiceChatRequest.Response
+      );
 
-      this.bot.ws.on('message', (message) => {
-        const response = JSON.parse(message);
-        if (response._type === 'CheckVoiceChatResponse') {
-          responseHandler(response);
-        }
-      });
+      return response.content;
+    } catch (error) {
+      const highriseError = new HighriseApiError("Error fetching users voice chat:", error);
+      this.bot.emit('error', highriseError);
+    }
 
-      // Send the payload
-      this.bot.ws.send(JSON.stringify(payload));
-    });
   }
 }
 
