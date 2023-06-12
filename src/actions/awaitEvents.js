@@ -32,13 +32,15 @@ class AwaitEvents {
     return new Promise((resolve) => {
       let timer;
       let collected = [];
+      let uniqueUsers = new Set();
 
       const listener = (user, message) => {
-        if ((!filter || filter(user, message)) && collected.length < max) {
+        if ((!filter || filter(user, message)) && !uniqueUsers.has(user.id)) {
           collected.push({ user, message });
+          uniqueUsers.add(user.id);
         }
 
-        if (collected.length >= max) {
+        if (max && collected.length >= max) {
           clearTimeout(timer);
           this.removeMessageListener(listener);
           resolve(collected);
@@ -49,7 +51,7 @@ class AwaitEvents {
 
       timer = setTimeout(() => {
         this.removeMessageListener(listener);
-        resolve([]); // Return an empty array to indicate no matching messages
+        resolve(collected);
       }, idle);
     });
   }
