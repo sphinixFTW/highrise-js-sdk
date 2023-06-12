@@ -24,7 +24,6 @@
   "author": "Sphinix aka: iHsein",
   "license": "MIT",
   "dependencies": {
-    "child_process": "^1.0.2",
     "colors": "^1.4.0",
     "events": "^3.3.0",
     "ws": "^8.13.0"
