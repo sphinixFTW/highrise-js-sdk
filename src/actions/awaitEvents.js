@@ -10,12 +10,22 @@ class AwaitEvents {
     if (this.bot.eventTypesOfInterest.includes('reactionCreate')) {
       this.bot.on('reactionCreate', this.handleReactionCreate.bind(this));
     }
+    if (this.bot.eventTypesOfInterest.includes('emoteCreate')) {
+      this.bot.on('emoteCreate', this.handleEmoteCreate.bind(this));
+    }
   }
 
   handleChatMessageCreate(user, message) {
     // Notify all message listeners
     for (const listener of this.messageListeners.keys()) {
       listener(user, message);
+    }
+  }
+
+  handleEmoteCreate(sender, receiver, emote) {
+    // Notify all emotes listeners
+    for (const listener of this.emoteListeners.keys()) {
+      listener(sender, receiver, emote);
     }
   }
 
@@ -62,16 +72,18 @@ class AwaitEvents {
     return new Promise((resolve) => {
       let timer;
       let collected = [];
+      let uniqueUsers = new Set();
 
       const listener = (sender, receiver, reaction) => {
-        if (!filter || filter(sender, receiver, reaction)) {
+        if ((!filter || filter(sender, receiver, reaction)) && !uniqueUsers.has(sender.id)) {
           collected.push({ sender, receiver, reaction });
+          uniqueUsers.add(sender.id);
+        }
 
-          if (collected.length >= max) {
-            clearTimeout(timer);
-            this.removeReactionListener(listener);
-            resolve(collected);
-          }
+        if (max === true && collected.length >= uniqueUsers.size) {
+          clearTimeout(timer);
+          this.removeReactionListener(listener);
+          resolve(collected);
         }
       };
 
@@ -79,9 +91,47 @@ class AwaitEvents {
 
       timer = setTimeout(() => {
         this.removeReactionListener(listener);
-        resolve([]); // Return an empty array to indicate no matching reactions
+        resolve(collected);
       }, idle);
     });
+  }
+
+  awaitEmotes(options) {
+    const { filter, max, idle } = options;
+
+    return new Promise((resolve) => {
+      let timer;
+      let collected = [];
+      let uniqueUsers = new Set();
+
+      const listener = (sender, receiver, emote) => {
+        if ((!filter || filter(sender, receiver, emote)) && !uniqueUsers.has(sender.id)) {
+          collected.push({ sender, receiver, emote });
+          uniqueUsers.add(sender.id);
+        }
+
+        if (max && collected.length >= max) {
+          clearTimeout(timer);
+          this.removeEmoteListener(listener);
+          resolve(collected);
+        }
+      };
+
+      this.addEmoteListener(listener);
+
+      timer = setTimeout(() => {
+        this.removeEmoteListener(listener);
+        resolve(collected);
+      }, idle);
+    });
+  }
+
+  addEmoteListener(listener) {
+    this.emoteListeners.set(listener, true);
+  }
+
+  removeEmoteListener(listener) {
+    this.emoteListeners.delete(listener);
   }
 
   addReactionListener(listener) {
