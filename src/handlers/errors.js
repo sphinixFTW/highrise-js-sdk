@@ -132,6 +132,19 @@ class InvalidRoomIdError extends Error {
   }
 }
 
+/**
+* Error class for Invalid Converstaion ID errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidConversationIdError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidConversationIdError'
+  }
+}
+
 
 module.exports = {
   HighriseApiError,
@@ -143,5 +156,6 @@ module.exports = {
   InvalidMessageTypeError,
   InvalidCoordinatesError,
   InvalidRoomIdError,
-  InvalidFacingError
+  InvalidFacingError,
+  InvalidConversationIdError
 }

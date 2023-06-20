@@ -9,6 +9,7 @@ const handleReactEvent = require("../models/events/handleReactEvent");
 const handleTipsEvent = require("../models/events/handleTipsEvent");
 const handleMovementEvent = require("../models/events/handleMovementEvent");
 const handleVoiceEvent = require("../models/events/handleVoiceEvent");
+const handleDMEvent = require("../models/events/handleDMEvent");
 
 function handleMessageEvent(event, highriseInstance) {
   try {
@@ -36,6 +37,8 @@ function handleMessageEvent(event, highriseInstance) {
         handleMovementEvent(data, emit);
       } else if (eventType === 'voiceChatCreate') {
         handleVoiceEvent(data, emit);
+      } else if (eventType === 'directMessageCreate') {
+        handleDMEvent(data, emit);
       }
     }
   } catch (error) {

@@ -61,8 +61,9 @@ class RoomUsers {
 
       for (const [userObj, positionObj] of users) {
         const userData = {
+          id: userObj.id, // Include the 'id' property
+          username: userObj.username, // Include the 'username' property
           position: positionObj,
-          name: userObj.username,
         };
         this.userMap.set(userObj.id, userData);
       }
@@ -83,84 +84,58 @@ class RoomUsers {
 
   cache = {
     get: () => {
-      return {
-        ids: [...this.userMap.keys()],
-        positions: [...this.userMap.values()].map(user => user.position),
-        usernames: [...this.userMap.values()].map(user => user.name)
-      };
+      const userMapValues = [...this.userMap.values()];
+      const result = userMapValues.map(user => [{ id: user.id, username: user.username }, user.position]);
+      return result;
     },
-    id: (usernameOrArray) => {
+    id: (username) => {
       try {
-        if (Array.isArray(usernameOrArray)) {
-          const result = [];
-          for (const username of usernameOrArray) {
-            const user = [...this.userMap.entries()].find(([_, { name }]) => name === username);
-            if (user) result.push(user[0]);
-          }
-          return result;
-        } else {
-          const user = [...this.userMap.entries()].find(([_, { name }]) => name === usernameOrArray);
-          if (user) return user[0];
-        }
+        const user = [...this.userMap.values()].find(user => user.username === username);
+        if (user) return user.id;
       } catch (error) {
-        throw new InvalidNameError(`No user found with the name "${usernameOrArray}".`);
+        throw new InvalidNameError(`No user found with the name "${username}".`);
       }
     },
-    position: (userIdOrArray) => {
+    position: (userId) => {
       try {
-        if (Array.isArray(userIdOrArray)) {
-          const result = [];
-          for (const userId of userIdOrArray) {
-            const user = this.userMap.get(userId);
-            if (user) result.push(user.position);
-          }
-          return result;
-        } else {
-          const user = this.userMap.get(userIdOrArray);
-          if (user) return user.position;
-        }
+        const user = this.userMap.get(userId);
+        if (user) return user.position;
       } catch (error) {
-        throw new InvalidUserIdError(`No user found with the ID "${userIdOrArray}".`);
+        throw new InvalidUserIdError(`No user found with the ID "${userId}".`);
       }
-
     },
-    username: (userIdOrArray) => {
+    username: (userId) => {
       try {
-        if (Array.isArray(userIdOrArray)) {
-          const result = [];
-          for (const userId of userIdOrArray) {
-            const user = this.userMap.get(userId);
-            if (user) result.push(user.name);
-          }
-          return result;
-        } else {
-          const user = this.userMap.get(userIdOrArray);
-          if (user) return user.name;
-        }
+        const user = this.userMap.get(userId);
+        if (user) return user.username;
       } catch (error) {
-        throw new InvalidUserIdError(`No user found with the ID "${userIdOrArray}".`);
+        throw new InvalidUserIdError(`No user found with the ID "${userId}".`);
       }
-
     }
   };
 
 
+
   async fetch() {
     try {
-      const sendPayloadAndGetResponse = new SendPayloadAndGetResponse(this.bot);
-      const getRoomUsersRequest = new GetRoomUsersRequest(this.reqId.toString());
-      const payload = {
-        _type: "GetRoomUsersRequest",
-        rid: getRoomUsersRequest.rid
-      };
-      const response = await sendPayloadAndGetResponse.sendPayloadAndGetResponse(
-        payload,
-        GetRoomUsersRequest.Response
-      );
+      if (this.bot.ws.readyState === this.bot.websocket.OPEN) {
+        const getRoomUsersRequest = new GetRoomUsersRequest(this.reqId.toString());
+        const payload = {
+          _type: "GetRoomUsersRequest",
+          rid: getRoomUsersRequest.rid,
+          content: getRoomUsersRequest.content
+        };
 
-      return response.content;
+        const sender = new SendPayloadAndGetResponse(this.bot); // Create an instance of SendPayloadAndGetResponse
+        const response = await sender.sendPayloadAndGetResponse(
+          payload,
+          GetRoomUsersRequest.Response
+        );
 
+        return response.content.content;
+      }
     } catch (error) {
+      console.error(error);
       const highriseError = new HighriseApiError("Error fetching room users:", error);
       this.bot.emit('error', highriseError);
     }

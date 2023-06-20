@@ -45,7 +45,7 @@ class Move {
     }
   }
 
-  sit(entity_id, anchor_ix) {
+  sit(entity_id, anchor_ix = 0) {
     try {
       const entityIDString = String(entity_id);
       const anchorIndex = parseInt(anchor_ix, 10);

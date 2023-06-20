@@ -3,6 +3,9 @@ class AwaitEvents {
     this.bot = bot;
     this.messageListeners = new Map();
     this.reactionListeners = new Map();
+    this.emoteListeners = new Map();
+    this.tipsListeners = new Map();
+
     if (this.bot.eventTypesOfInterest.includes('messages')) {
       this.bot.on('chatMessageCreate', this.handleChatMessageCreate.bind(this));
       this.bot.on('whisperMessageCreate', this.handleChatMessageCreate.bind(this));
@@ -12,6 +15,9 @@ class AwaitEvents {
     }
     if (this.bot.eventTypesOfInterest.includes('emoteCreate')) {
       this.bot.on('emoteCreate', this.handleEmoteCreate.bind(this));
+    }
+    if (this.bot.eventTypesOfInterest.includes('tipReactionCreate')) {
+      this.bot.on('tipReactionCreate', this.handleTipsCreate.bind(this));
     }
   }
 
@@ -33,6 +39,13 @@ class AwaitEvents {
     // Notify all reaction listeners
     for (const listener of this.reactionListeners.keys()) {
       listener(sender, receiver, reaction);
+    }
+  }
+
+  handleTipsCreate(sender, receiver, item) {
+    // Notify all tips listeners
+    for (const listener of this.tipsListeners.keys()) {
+      listener(sender, receiver, item);
     }
   }
 
@@ -124,6 +137,44 @@ class AwaitEvents {
         resolve(collected);
       }, idle);
     });
+  }
+
+  awaitTips(options) {
+    const { filter, max, idle } = options;
+
+    return new Promise((resolve) => {
+      let timer;
+      let collected = [];
+      let uniqueUsers = new Set();
+
+      const listener = (sender, receiver, item) => {
+        if ((!filter || filter(sender, receiver, item)) && !uniqueUsers.has(sender.id)) {
+          collected.push({ sender, receiver, item });
+          uniqueUsers.add(sender.id);
+        }
+
+        if (max && collected.length >= max) {
+          clearTimeout(timer);
+          this.removeTipsListener(listener);
+          resolve(collected);
+        }
+      };
+
+      this.addTipsListener(listener);
+
+      timer = setTimeout(() => {
+        this.removeTipsListener(listener);
+        resolve(collected);
+      }, idle);
+    });
+  }
+
+  addTipsListener(listener) {
+    this.tipsListeners.set(listener, true);
+  }
+
+  removeTipsListener(listener) {
+    this.tipsListeners.delete(listener);
   }
 
   addEmoteListener(listener) {

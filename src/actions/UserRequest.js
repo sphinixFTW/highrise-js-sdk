@@ -266,7 +266,7 @@ class Users {
     }
   };
 
-  async teleport(userId, x, y, z, facing) {
+  async teleport(userId, x, y, z, facing = 'FrontRight') {
     try {
       const validFacing = ['BackLeft', 'BackRight', 'FrontLeft', 'FrontRight'];
 
@@ -331,21 +331,26 @@ class Users {
   permissions = {
     get: async (userId) => {
       try {
-        const sendPayloadAndGetResponse = new SendPayloadAndGetResponse(this.bot);
-        const getRoomPrivilegeRequest = new GetRoomPrivilegeRequest(userId);
-        const payload = {
-          _type: 'GetRoomPrivilegeRequest',
-          user_id: getRoomPrivilegeRequest.user_id,
-          rid: getRoomPrivilegeRequest.rid,
-        };
 
-        const response = await sendPayloadAndGetResponse.sendPayloadAndGetResponse(
-          payload,
-          GetRoomPrivilegeRequest.Response
-        );
+        if (!userId || typeof userId !== 'string') {
+          throw new InvalidUserIdError('Invalid user ID. Please provide valid value for user ID.'.red);
+        }
+        if (this.bot.ws.readyState === this.bot.websocket.OPEN) {
+          const getRoomPrivilegeRequest = new GetRoomPrivilegeRequest(userId);
+          const payload = {
+            _type: "GetRoomPrivilegeRequest",
+            user_id: getRoomPrivilegeRequest.user_id,
+            rid: getRoomPrivilegeRequest.rid
+          };
 
-        return response.content;
+          const sender = new SendPayloadAndGetResponse(this.bot); // Create an instance of SendPayloadAndGetResponse
+          const response = await sender.sendPayloadAndGetResponse(
+            payload,
+            GetRoomPrivilegeRequest.Response
+          );
 
+          return response.content.content;
+        }
       } catch (error) {
         const highriseError = new HighriseApiError("Error fetching users permissions:", error);
         this.bot.emit('error', highriseError);
@@ -432,21 +437,22 @@ class Users {
           throw new InvalidUserIdError('Invalid user ID. Please provide a valid value for user ID.'.red);
         }
 
-        const sendPayloadAndGetResponse = new SendPayloadAndGetResponse(this.bot);
-        const getBackpackRequest = new GetBackpackRequest(userId);
+        if (this.bot.ws.readyState === this.bot.websocket.OPEN) {
+          const getBackpackRequest = new GetBackpackRequest(userId);
+          const payload = {
+            _type: "GetBackpackRequest",
+            user_id: getBackpackRequest.user_id,
+            rid: getBackpackRequest.rid
+          };
 
-        const payload = {
-          _type: "GetBackpackRequest",
-          user_id: getBackpackRequest.user_id,
-          rid: getBackpackRequest.rid
-        };
+          const sender = new SendPayloadAndGetResponse(this.bot); // Create an instance of SendPayloadAndGetResponse
+          const response = await sender.sendPayloadAndGetResponse(
+            payload,
+            GetBackpackRequest.Response
+          );
 
-        const response = await sendPayloadAndGetResponse.sendPayloadAndGetResponse(
-          payload,
-          GetBackpackRequest.Response
-        )
-
-        return response.content
+          return response.backpack.backpack;
+        }
 
       } catch (error) {
         const highriseError = new HighriseApiError("Error fetching users backpack:", error);
@@ -458,25 +464,27 @@ class Users {
     get: async (userId) => {
       try {
 
-        if (!userId || userId === undefined || userId === null) {
+        if (!userId || typeof userId !== 'string') {
           throw new InvalidUserIdError('Invalid user ID. Please provide a valid value for user ID.'.red);
         }
 
-        const sendPayloadAndGetResponse = new SendPayloadAndGetResponse(this.bot);
-        const getUserOutfitRequest = new GetUserOutfitRequest(userId);
+        if (this.bot.ws.readyState === this.bot.websocket.OPEN) {
+          const getUserOutfitRequest = new GetUserOutfitRequest(userId);
+          const payload = {
+            _type: "GetUserOutfitRequest",
+            user_id: getUserOutfitRequest.user_id,
+            rid: getUserOutfitRequest.rid
+          };
 
-        const payload = {
-          _type: "GetUserOutfitRequest",
-          user_id: getUserOutfitRequest.user_id,
-          rid: getUserOutfitRequest.rid
-        };
+          const sender = new SendPayloadAndGetResponse(this.bot); // Create an instance of SendPayloadAndGetResponse
+          const response = await sender.sendPayloadAndGetResponse(
+            payload,
+            GetUserOutfitRequest.Response
+          );
 
-        const response = await sendPayloadAndGetResponse.sendPayloadAndGetResponse(
-          payload,
-          GetUserOutfitRequest.Response
-        )
+          return response.outfit.outfit
 
-        return response.content
+        }
       } catch (error) {
         const highriseError = new HighriseApiError("Error fetching users outfit:", error);
         this.bot.emit('error', highriseError);

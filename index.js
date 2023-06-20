@@ -17,9 +17,10 @@ const { AwaitEvents } = require('./src/actions/awaitEvents');
 const { Users } = require('./src/actions/UserRequest');
 const { Move } = require('./src/actions/FloorHitRequest');
 const { VoiceChat } = require('./src/actions/GetVoiceChatRequest');
+const { DirectMessages } = require('./src/actions/DirectMessages');
 
 // Errors:
-const { HighriseApiError, InvalidMessageTypeError, InvalidUserIdError } = require('./src/handlers/errors');
+const { HighriseApiError, InvalidMessageTypeError, InvalidUserIdError, InvalidConversationIdError, InvalidRoomIdError } = require('./src/handlers/errors');
 require("colors");
 
 class Highrise extends EventEmitter {
@@ -65,6 +66,7 @@ class Highrise extends EventEmitter {
     this.chat = new AwaitEvents(this);
     this.player = new Users(this);
     this.move = new Move(this);
+    this.inbox = new DirectMessages(this);
   };
 
   sendKeepalive() {
@@ -202,6 +204,45 @@ class Highrise extends EventEmitter {
     }
   };
 
+  sendPrivateInvite(conversation_id, room_id) {
+    try {
+      if (this.ws.readyState === WebSocket.OPEN) {
+        const payload = {
+          _type: 'SendMessageRequest',
+          conversation_id: conversation_id,
+          content: '',
+          type: 'invite',
+          room_id: room_id,
+          rid: null
+        };
+        this.ws.send(JSON.stringify(payload));
+      }
+    } catch (error) {
+      const highriseError = new HighriseApiError("Error sending message request:", error);
+      this.emit('error', highriseError);
+    }
+  }
+
+  sendPrivateMessage(conversation_id, content) {
+    try {
+
+      if (this.ws.readyState === WebSocket.OPEN) {
+        const payload = {
+          _type: 'SendMessageRequest',
+          conversation_id: conversation_id,
+          content: content,
+          type: 'text',
+          room_id: null,
+          rid: null
+        };
+        this.ws.send(JSON.stringify(payload));
+      }
+    } catch (error) {
+      const highriseError = new HighriseApiError("Error sending message request:", error);
+      this.emit('error', highriseError);
+    }
+  }
+
   message = {
     send: (message) => {
       try {
@@ -236,7 +277,48 @@ class Highrise extends EventEmitter {
       }
 
     }
-  };
+  }
+
+  invite = {
+    send: (conversation_id, room_id) => {
+      try {
+
+        if (!conversation_id || typeof conversation_id !== 'string') {
+          throw new InvalidConversationIdError('Invalid conversation ID. Please provide a valid value for the conversation ID.'.red);
+        }
+
+        if (!room_id || typeof room_id !== 'string') {
+          throw new InvalidRoomIdError('Invalid room ID. Please provide a valid value for the room ID.'.red);
+        }
+
+        this.sendPrivateInvite(conversation_id, room_id);
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  direct = {
+    send: (conversation_id, content) => {
+      try {
+
+        if (!conversation_id || typeof conversation_id !== 'string') {
+          throw new InvalidConversationIdError('Invalid conversation ID. Please provide a valid value for the conversation ID.'.red);
+        }
+
+        if (!content) {
+          throw new InvalidMessageTypeError(`You can't send an empty message`.red);
+        }
+
+        this.sendPrivateMessage(conversation_id, content);
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
 }
 
 module.exports = { Highrise, eventTypeMap };

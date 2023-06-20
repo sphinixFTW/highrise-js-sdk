@@ -10,6 +10,120 @@ class User {
   }
 }
 
+class Position {
+  /**
+   * Position class representing a position in 3D space.
+   * @param {number} x - The x-coordinate.
+   * @param {number} y - The y-coordinate.
+   * @param {number} z - The z-coordinate.
+   * @param {string} facing - The direction the entity is facing. Defaults to "FrontRight".
+   */
+  constructor(x, y, z, facing = "FrontRight") {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.facing = facing;
+  }
+}
+
+class AnchorPosition {
+  /**
+   * Constructor for an AnchorPosition object.
+   * 
+   * @param {string} entity_id - The ID of the entity.
+   * @param {number} anchor_ix - The index of the anchor.
+   */
+  constructor(entity_id, anchor_ix) {
+    this.entity_id = entity_id;
+    this.anchor_ix = anchor_ix;
+  }
+}
+
+class CurrencyItem {
+  /**
+   * Constructor for a CurrencyItem object.
+   * 
+   * @param {string} type - The type of currency.
+   * @param {number} amount - The amount of currency.
+   */
+  constructor(type, amount) {
+    this.type = type;
+    this.amount = amount;
+  }
+}
+
+class RoomPermissions {
+  /**
+   * Represents the room permissions for a given user.
+   * Both moderator and designer can be null, meaning the bot
+   * is not a moderator/designer, or can be a boolean value.
+   */
+  constructor() {
+    this.moderator = null;
+    this.designer = null;
+  }
+}
+
+class Item {
+  /**
+   * Constructor for an Item object.
+   * 
+   * @param {string} type - The type of item.
+   * @param {number} amount - The amount of the item.
+   * @param {string} id - The ID of the item.
+   */
+  constructor(type, amount, id) {
+    this.type = type;
+    this.amount = amount;
+    this.id = id;
+  }
+}
+
+class Message {
+  /**
+   * A Highrise conversation message.
+   * @param {string} message_id - The ID of the message.
+   * @param {string} conversation_id - The ID of the conversation.
+   * @param {Date|null} createdAt - The creation date of the message.
+   * @param {string} content - The content of the message.
+   * @param {string} sender_id - The ID of the sender.
+   * @param {("text"|"invite")} category - The category of the message.
+   */
+  constructor(message_id, conversation_id, createdAt, content, sender_id, category) {
+    this.message_id = message_id;
+    this.conversation_id = conversation_id;
+    this.createdAt = createdAt;
+    this.content = content;
+    this.sender_id = sender_id;
+    this.category = category;
+  }
+}
+
+class Conversation {
+  /**
+   * A Highrise conversation. Bots can join direct conversations, but not group conversations.
+   * Bots can respond to messages in conversations, but cannot initiate messages.
+   * @param {string} id - The ID of the conversation.
+   * @param {boolean} did_join - Indicates whether the bot has joined the conversation.
+   * @param {number} unread_count - The number of unread messages in the conversation.
+   * @param {Message|null} last_message - The last message in the conversation.
+   * @param {boolean} muted - Indicates whether the conversation is muted.
+   * @param {Array<string>|null} member_ids - The IDs of the conversation members.
+   * @param {string|null} name - The name of the conversation.
+   * @param {string|null} owner_id - The ID of the conversation owner.
+   */
+  constructor(id, did_join, unread_count, last_message, muted, member_ids, name, owner_id) {
+    this.id = id;
+    this.did_join = did_join;
+    this.unread_count = unread_count;
+    this.last_message = last_message;
+    this.muted = muted;
+    this.member_ids = member_ids;
+    this.name = name;
+    this.owner_id = owner_id;
+  }
+}
+
 class ChatRequest {
   /**
    * ChatRequest class representing a request to send a chat message.
@@ -39,116 +153,6 @@ class ChatRequest {
     return ChatResponse;
   }
 }
-
-class Position {
-  /**
-   * Position class representing a position in 3D space.
-   * @param {number} x - The x-coordinate.
-   * @param {number} y - The y-coordinate.
-   * @param {number} z - The z-coordinate.
-   * @param {string} facing - The direction the entity is facing. Defaults to "FrontRight".
-   */
-  constructor(x, y, z, facing = "FrontRight") {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.facing = facing;
-  }
-}
-
-
-class AnchorPosition {
-  /**
-   * Constructor for an AnchorPosition object.
-   * 
-   * @param {string} entity_id - The ID of the entity.
-   * @param {number} anchor_ix - The index of the anchor.
-   */
-  constructor(entity_id, anchor_ix) {
-    this.entity_id = entity_id;
-    this.anchor_ix = anchor_ix;
-  }
-}
-
-class CurrencyItem {
-  /**
-   * Constructor for a CurrencyItem object.
-   * 
-   * @param {string} type - The type of currency.
-   * @param {number} amount - The amount of currency.
-   */
-  constructor(type, amount) {
-    this.type = type;
-    this.amount = amount;
-  }
-}
-
-class Item {
-  /**
-   * Constructor for an Item object.
-   * 
-   * @param {string} type - The type of item.
-   * @param {number} amount - The amount of the item.
-   * @param {string} id - The ID of the item.
-   */
-  constructor(type, amount, id) {
-    this.type = type;
-    this.amount = amount;
-    this.id = id;
-  }
-}
-
-class GetRoomUsersRequest {
-  /**
-   * @param {string} rid - The room ID to get users from.
-   */
-  constructor(rid) {
-    this.rid = rid;
-  }
-
-  static get Response() {
-    class GetRoomUsersResponse {
-      /**
-       * @param {Array} content - The users in the room.
-       * @param {string} rid - The request ID.
-       */
-      constructor(content, rid) {
-        this.content = content;
-        this.rid = rid;
-      }
-    }
-    return GetRoomUsersResponse;
-  }
-}
-
-class GetWalletRequest {
-  /**
-   * Creates a new instance of GetWalletRequest.
-   * @param {string|null} rid - The request ID.
-   */
-  constructor(rid = null) {
-    this.rid = rid;
-  }
-
-  static get Response() {
-    /**
-     * The successful response to a GetWalletRequest.
-     */
-    class GetWalletResponse {
-      /**
-       * Creates a new instance of GetWalletResponse.
-       * @param {Object} content - The content of the response.
-       * @param {string} rid - The request ID.
-       */
-      constructor(content, rid) {
-        this.content = content;
-        this.rid = rid;
-      }
-    }
-    return GetWalletResponse;
-  }
-}
-
 
 class EmoteRequest {
   /**
@@ -182,7 +186,6 @@ class EmoteRequest {
     return EmoteRequest.EmoteResponse;
   }
 }
-
 
 /**
 * Represents a request to add a reaction to a message.
@@ -285,8 +288,6 @@ class ReactionRequest {
   }
 }
 
-
-
 /**
 * The request to teleport a user to a new destination.
 */
@@ -318,6 +319,192 @@ class TeleportRequest {
 }
 
 
+class SendMessageRequest {
+  /**
+   * Send a message to a conversation. If the bot wishes to send a room invite, the room_id must be provided.
+   * @param {string} conversation_id - The ID of the conversation.
+   * @param {string} content - The content of the message.
+   * @param {("text"|"invite")} type - The type of the message.
+   * @param {string|null} room_id - The ID of the room (optional, for room invites).
+   * @param {string|null} rid - The ID of the request (optional).
+   */
+  constructor(conversation_id, content, type = 'text', room_id = null, rid = null) {
+    this.conversation_id = conversation_id;
+    this.content = content;
+    this.type = type;
+    this.room_id = room_id;
+    this.rid = rid;
+  }
+
+  /**
+   * @typedef {object} SendMessageResponse
+   * @property {string|null} rid - The ID of the request.
+   */
+}
+
+class SendMessageResponse {
+  /**
+   * Constructor for a SendMessageResponse object.
+   * @param {string|null} rid - The ID of the request.
+   */
+  constructor(rid = null) {
+    this.rid = rid;
+  }
+}
+
+class GetConversationsRequest {
+  /**
+   * Get the conversations of a bat. if not_joined is true, only get the conversations that bot has not joined yet will
+   * be returned. 20 conversations will be returned at most, if all 20 conversations are returned, the last_id can be used
+   * to retrieve the next 20 conversations.
+   */
+  constructor() {
+    this.not_joined = false;
+    this.last_id = null;
+    this.rid = null;
+  }
+
+  /**
+   * @typedef {Object} GetConversationsResponse
+   * @property {Array<Conversation>} conversations - List of conversations.
+   * @property {number} not_joined - Number of conversations that the bot has not joined.
+   * @property {string|null} rid - Optional parameter representing the ID of the request.
+   */
+
+  /**
+   * Get the conversations response.
+   * @type {GetConversationsResponse}
+   */
+  static get GetConversationsResponse() {
+    class GetConversationsResponse {
+      /**
+       * @param {Array<Conversation>} conversations - List of conversations.
+       * @param {number} not_joined - Number of conversations that the bot has not joined.
+       * @param {string|null} rid - Optional parameter representing the ID of the request.
+       */
+      constructor(conversations, not_joined, rid) {
+        this.conversations = conversations;
+        this.not_joined = not_joined;
+        this.rid = rid;
+      }
+    }
+    return GetConversationsResponse;
+  }
+}
+
+class GetMessagesRequest {
+  /**
+   * Get the messages of a conversation.
+   * 20 messages will be returned at most, if all 20 messages are returned,
+   * the last_message_id can be used to retrieve the next 20 messages.
+   * @param {string} conversation_id - The ID of the conversation.
+   * @param {string|null} last_message_id - The ID of the last retrieved message (optional).
+   * @param {string|null} rid - The ID of the request (optional).
+   */
+  constructor(conversation_id, last_message_id = null, rid = null) {
+    this.conversation_id = conversation_id;
+    this.last_message_id = last_message_id;
+    this.rid = rid;
+  }
+
+  /**
+   * @typedef {object} GetMessagesResponse
+   * @property {Array<Message>} messages - The list of messages.
+   * @property {string|null} rid - The ID of the request.
+   */
+}
+
+class GetMessagesResponse {
+  /**
+   * Constructor for a GetMessagesResponse object.
+   * @param {Array<Message>} messages - The list of messages.
+   * @param {string|null} rid - The ID of the request.
+   */
+  constructor(messages, rid = null) {
+    this.messages = messages;
+    this.rid = rid;
+  }
+}
+
+class LeaveConversationRequest {
+  /**
+   * Leave a conversation.
+   * @param {string} conversation_id - The ID of the conversation.
+   * @param {string|null} rid - The ID of the request (optional).
+   */
+  constructor(conversation_id, rid = null) {
+    this.conversation_id = conversation_id;
+    this.rid = rid;
+  }
+
+  /**
+   * @typedef {object} LeaveConversationResponse
+   * @property {string|null} rid - The ID of the request.
+   */
+}
+
+class LeaveConversationResponse {
+  /**
+   * Constructor for a LeaveConversationResponse object.
+   * @param {string|null} rid - The ID of the request.
+   */
+  constructor(rid = null) {
+    this.rid = rid;
+  }
+}
+
+class GetRoomUsersRequest {
+  /**
+   * @param {string} rid - The room ID to get users from.
+   */
+  constructor(rid) {
+    this.rid = rid;
+  }
+
+  static get Response() {
+    class GetRoomUsersResponse {
+      /**
+       * @param {Array} content - The users in the room.
+       * @param {string} rid - The request ID.
+       */
+      constructor(content, rid) {
+        this.content = content;
+        this.rid = rid;
+      }
+    }
+    return GetRoomUsersResponse;
+  }
+}
+
+class GetWalletRequest {
+  /**
+   * Creates a new instance of GetWalletRequest.
+   * @param {string|null} rid - The request ID.
+   */
+  constructor(rid = null) {
+    this.rid = rid;
+  }
+
+  static get Response() {
+    /**
+     * The successful response to a GetWalletRequest.
+     */
+    class GetWalletResponse {
+      /**
+       * Creates a new instance of GetWalletResponse.
+       * @param {Object} content - The content of the response.
+       * @param {string} rid - The request ID.
+       */
+      constructor(content, rid) {
+        this.content = content;
+        this.rid = rid;
+      }
+    }
+    return GetWalletResponse;
+  }
+}
+
+
 class TeleportResponse {
   /**
    * The successful response to a `TeleportRequest`.
@@ -327,9 +514,6 @@ class TeleportResponse {
     this.rid = rid;
   }
 }
-
-TeleportResponse.Response = TeleportResponse;
-TeleportRequest.Response = TeleportResponse;
 
 class FloorHitRequest {
   /**
@@ -389,18 +573,6 @@ class AnchorHitRequest {
   }
 }
 
-class RoomPermissions {
-  /**
-   * Represents the room permissions for a given user.
-   * Both moderator and designer can be null, meaning the bot
-   * is not a moderator/designer, or can be a boolean value.
-   */
-  constructor() {
-    this.moderator = null;
-    this.designer = null;
-  }
-}
-
 class GetRoomPrivilegeRequest {
   /**
    * Construct a GetRoomPrivilegeRequest.
@@ -428,10 +600,6 @@ class GetRoomPrivilegeRequest {
     return GetRoomPrivilegeResponse;
   }
 }
-
-// Assign the inner class as a property of the outer class
-GetRoomPrivilegeRequest.Response = GetRoomPrivilegeRequest.GetRoomPrivilegeResponse;
-
 
 /**
 * Represents a request to moderate a room for a given user.
@@ -483,9 +651,8 @@ class SendPayloadAndGetResponse {
     this.bot = bot;
   }
 
-  async sendPayloadAndGetResponse(payload, responseClass) {
+  sendPayloadAndGetResponse(payload, responseClass) {
     if (this.bot.ws.readyState === this.bot.websocket.OPEN) {
-
       return new Promise((resolve, reject) => {
         const requestId = generateRequestId();
 
@@ -497,7 +664,7 @@ class SendPayloadAndGetResponse {
             messageObject.rid === requestId
           ) {
             this.bot.ws.off('message', messageHandler);
-            resolve(new responseClass(messageObject.content, messageObject.rid));
+            resolve(new responseClass(messageObject, requestId));
           }
         };
 
@@ -511,7 +678,6 @@ class SendPayloadAndGetResponse {
           }
         );
       });
-
     } else {
       return console.error("Error: WebSocket is not open: readyState 2".red);
     }
@@ -705,9 +871,6 @@ class RemoveSpeakerRequest {
   }
 }
 
-MoveUserToRoomResponse.Response = MoveUserToRoomResponse;
-MoveUserToRoomRequest.Response = MoveUserToRoomResponse;
-
 class GetUserOutfitRequest {
   /**
    * Get the outfit of a user.
@@ -737,9 +900,6 @@ class GetUserOutfitRequest {
     return GetUserOutfitResponse;
   }
 }
-
-// Assign the inner class as a property of the outer class
-GetUserOutfitRequest.Response = GetUserOutfitRequest.GetUserOutfitResponse;
 
 class GetBackpackRequest {
   /**
@@ -771,10 +931,6 @@ class GetBackpackRequest {
   }
 }
 
-// Assign the inner class as a property of the outer class
-GetBackpackRequest.Response = GetBackpackRequest.GetBackpackResponse;
-
-
 class ChangeBackpackRequest {
   /**
    * @param {string} user_id - The ID of the user.
@@ -803,9 +959,20 @@ class ChangeBackpackRequest {
   }
 }
 
-// Assign the inner class as a property of the outer class
-ChangeBackpackRequest.Response = ChangeBackpackRequest.ChangeBackpackResponse;
 
+// Assign the inner class as a property of the outer class
+MoveUserToRoomResponse.Response = MoveUserToRoomResponse;
+MoveUserToRoomRequest.Response = MoveUserToRoomResponse;
+GetConversationsRequest.Response = GetConversationsRequest.GetConversationsResponse;
+SendMessageRequest.Response = SendMessageResponse;
+GetMessagesRequest.Response = GetMessagesResponse;
+LeaveConversationRequest.Response = LeaveConversationResponse;
+TeleportResponse.Response = TeleportResponse;
+TeleportRequest.Response = TeleportResponse;
+GetRoomPrivilegeRequest.Response = GetRoomPrivilegeRequest.GetRoomPrivilegeResponse;
+ChangeBackpackRequest.Response = ChangeBackpackRequest.ChangeBackpackResponse;
+GetBackpackRequest.Response = GetBackpackRequest.GetBackpackResponse;
+GetUserOutfitRequest.Response = GetUserOutfitRequest.GetUserOutfitResponse;
 
 module.exports = {
   User,
@@ -835,5 +1002,11 @@ module.exports = {
   SendPayload,
   GetUserOutfitRequest,
   GetBackpackRequest,
-  ChangeBackpackRequest
+  ChangeBackpackRequest,
+  Message,
+  Conversation,
+  GetConversationsRequest,
+  SendMessageRequest,
+  GetMessagesRequest,
+  LeaveConversationRequest
 }
