@@ -94,6 +94,22 @@ client.on('whisperMessageCreate', (user, message) => {
   console.log(`[${user.username}] (whisper): ${message}`);
 });
 ```
+- directMessageCreate
+```js
+// Event emitted when a direct message is created.
+client.on('directMessageCreate', (user, data) => {
+  // Process the direct message event
+  console.log('Direct message received');
+  console.log('User ID:', user);
+  console.log('Conversation ID:', data.id);
+  console.log('Is New:', data.isNew);
+
+  // Perform additional actions or responses based on the message
+
+  // Example: Send a reply
+  client.direct.send(data.id, 'Thank you for your message!');
+});
+```
 - emoteCreate
 ```js
 // Event emitted when an emote is created.
