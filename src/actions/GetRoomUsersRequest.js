@@ -20,7 +20,8 @@ class RoomUsers {
 
           this.addUserToMap(user.id, {
             position: { x: 0, y: 0, z: 0, facing: 'FrontRight' },
-            name: user.username,
+            id: user.id,
+            username: user.username,
           });
 
         } catch (error) {
@@ -39,7 +40,6 @@ class RoomUsers {
         }
       });
     }
-
     if (this.bot.eventTypesOfInterest.includes('trackPlayerMovement')) {
       this.bot.on('trackPlayerMovement', async (user, position) => {
         try {
@@ -52,7 +52,6 @@ class RoomUsers {
         }
       });
     }
-
   }
 
   async fetchUserMap() {
