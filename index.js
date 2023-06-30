@@ -81,10 +81,7 @@ class Highrise extends EventEmitter {
 
     // Close the old WebSocket instance
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.removeEventListener('open', this.handleOpen.bind(this));
-      this.ws.removeEventListener('message', this.handleMessage.bind(this));
-      this.ws.removeEventListener('close', this.handleClose.bind(this));
-      this.ws.removeEventListener('error', this.handleError.bind(this));
+      this.removeEventListeners();
       this.ws.close();
     }
 
@@ -94,6 +91,7 @@ class Highrise extends EventEmitter {
       this.login(token, roomId); // Pass the token and roomId to the login method
     }, this.reconnectTimeoutDuration * 1000); // Multiply by 1000 to convert seconds to milliseconds
   }
+
 
   login(token, roomId) {
     if ((!token || token === "") && (!this.token || this.token === "")) {
@@ -116,6 +114,20 @@ class Highrise extends EventEmitter {
       },
     });
 
+    this.addEventListeners();
+  }
+
+  removeEventListeners() {
+    if (!this.ws) return;
+    this.ws.removeEventListener('open', this.handleOpen);
+    this.ws.removeEventListener('message', this.handleMessage);
+    this.ws.removeEventListener('close', this.handleClose);
+    this.ws.removeEventListener('error', this.handleError);
+  }
+
+  addEventListeners() {
+    if (!this.ws) return;
+
     this.ws.addEventListener('open', () => {
       console.log(`Connected Using Highrise Javascript SDK (v${version}) at (${today})`.green);
       this.sendKeepalive();
@@ -126,7 +138,6 @@ class Highrise extends EventEmitter {
     this.ws.addEventListener('close', this.close.bind(this));
     this.ws.addEventListener('error', this.handleError.bind(this));
   }
-
 
   close(event) {
     switch (event.code) {
