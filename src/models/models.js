@@ -959,8 +959,59 @@ class ChangeBackpackRequest {
   }
 }
 
+class BuyVoiceTimeRequest {
+  /**
+   * Buy a voice time for a room.
+   * @param {("bot_wallet_only"|"bot_wallet_priority"|"user_wallet_only")} paymentMethod - The payment method.
+   * @param {string|null} rid - The room ID (optional).
+   */
+  constructor(paymentMethod, rid = null) {
+    this.payment_method = paymentMethod;
+    this.rid = rid;
+  }
+
+  static Response = class BuyVoiceTimeResponse {
+    /**
+     * Buy a voice token response.
+     * @param {("success"|"insufficient_funds"|"only_token_bought")} result - The result of the purchase.
+     * @param {string|null} rid - The room ID (optional).
+     */
+    constructor(result, rid = null) {
+      this.result = result;
+      this.rid = rid;
+    }
+  };
+}
+
+class BuyRoomBoostRequest {
+  /**
+   * Buy a room boost.
+   * @param {("bot_wallet_only"|"bot_wallet_priority"|"user_wallet_only")} paymentMethod - The payment method.
+   * @param {number} amount - The amount of boosts to buy.
+   * @param {string|null} rid - The room ID (optional).
+   */
+  constructor(paymentMethod, amount = 1, rid = null) {
+    this.payment_method = paymentMethod;
+    this.amount = amount;
+    this.rid = rid;
+  }
+
+  static Response = class BuyRoomBoostResponse {
+    /**
+     * Buy a room boost response.
+     * @param {("success"|"insufficient_funds"|"only_token_bought")} result - The result of the purchase.
+     * @param {string|null} rid - The room ID (optional).
+     */
+    constructor(result, rid = null) {
+      this.result = result;
+      this.rid = rid;
+    }
+  };
+}
 
 // Assign the inner class as a property of the outer class
+BuyVoiceTimeRequest.Response = BuyVoiceTimeRequest.Response;
+BuyRoomBoostRequest.Response = BuyRoomBoostRequest.Response;
 MoveUserToRoomResponse.Response = MoveUserToRoomResponse;
 MoveUserToRoomRequest.Response = MoveUserToRoomResponse;
 GetConversationsRequest.Response = GetConversationsRequest.GetConversationsResponse;
@@ -1008,5 +1059,7 @@ module.exports = {
   GetConversationsRequest,
   SendMessageRequest,
   GetMessagesRequest,
-  LeaveConversationRequest
+  LeaveConversationRequest,
+  BuyVoiceTimeRequest,
+  BuyRoomBoostRequest
 }
