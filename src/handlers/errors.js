@@ -145,6 +145,31 @@ class InvalidConversationIdError extends Error {
   }
 }
 
+/**
+* Error class for Invalid Currency Amount errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidCurrencyAmount extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidCurrencyAmount'
+  }
+}
+
+/**
+* Error class for Invalid Payment Method errors.
+* @class
+* @extends Error
+* @param {string} message - The error message.
+*/
+class InvalidPaymentMethod extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidPaymentMethod'
+  }
+}
 
 module.exports = {
   HighriseApiError,
@@ -157,5 +182,7 @@ module.exports = {
   InvalidCoordinatesError,
   InvalidRoomIdError,
   InvalidFacingError,
-  InvalidConversationIdError
+  InvalidConversationIdError,
+  InvalidCurrencyAmount,
+  InvalidPaymentMethod
 }
